@@ -1,1 +1,1 @@
-console.log('cangurul nervos');
+console.log('pinguinul futacios');
