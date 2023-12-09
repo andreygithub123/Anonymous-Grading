@@ -1,3 +1,7 @@
+//livrable class
+//an instance of livrable class will be instantiated when the student decides to create a new project that he will be working on
+//the livrable class helps with organizing the project phases ( phase: I - until: 23/10/2023 - todo: frontend - video: uploadation - link of repository: https://gihtub.com)
+
 class Livrable{
 
     constructor(phaseNo,deliveryDate,comments,video,linkGit)
@@ -8,22 +12,10 @@ class Livrable{
         this.video=video;
         this.linkGit=linkGit;
     }
-
-    // get phaseNo(){
-    //     return this.phaseNo;
-    // }
-
-    // set phaseNo(newPhase){
-    //     this.phaseNo=newPhase;
-    // }
-
-    // functionx(){
-
-    // }
     
 }
 
-//export default Livrable;
+export default Livrable;
 
 //check
 //Date(year,month,day) - constructor for 00:00:00 creation
