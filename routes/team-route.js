@@ -28,7 +28,7 @@ team_router
     });
 
 
-user_team
+team_router
     .route("/teams/:id")
     .get(async(req,res) => {
         try{
