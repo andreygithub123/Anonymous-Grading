@@ -85,19 +85,20 @@ user_router
     })
 
 user_router
-    .route('/users/projectMembers')
+    .route("/users/getByType/:type")
     .get(async(req,res) => {
         try{
-            const projectMembers = await User.findAll({
+            const typeUsers = await User.findAll({
                 where: {
-                    type : "ProjectMember"
+                    type : req.params.type
                 }
             })
-            return res.status(200).json(projectMembers)
+            if(typeUsers)
+                return res.status(200).json(typeUsers)
         }
         catch(err)
         {
-            return res.status(404).json({message: 'ProjectMember type not found!'})
+            return res.status(404).json({message: `${req.params.type} type not found!` })
         }
     })
 
