@@ -20,12 +20,16 @@ const User = sequelize.define("User", {
     },
     type:{
         type: DataTypes.ENUM,
-        values: ['PM', 'PROF']
+        values: ['ProjectMember', 'Professor', 'Student']
     },
     teamId:
     {
       type: DataTypes.INTEGER,
       allowNull: true
+    },
+    password : {
+        type:DataTypes.STRING,
+        allowNull:false
     }
 
 });
