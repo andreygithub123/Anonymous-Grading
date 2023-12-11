@@ -10,7 +10,7 @@ require('./models/team');
 const app = express();
 app.use(express.json());
 app.use("/", user_router);
-// app.use("/", team_router);
+app.use("/", team_router);
 
 //use this when we want to precess the requests
 app.use( (req,res,next) => {//this a custom middleware function and has next()
