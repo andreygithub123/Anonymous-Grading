@@ -1,3 +1,4 @@
+const { message } = require("statuses");
 const User = require("../models/user");
 
 const express = require("express");
@@ -28,7 +29,7 @@ user_router
 
 
 user_router
-    .route("/users/:id")
+    .route("/users/getById/:id")
     .get(async(req,res) => {
         try{
             const user = await User.findByPk(req.params.id);
@@ -70,7 +71,7 @@ user_router
             if(user)
             {
                 await user.destroy();
-                return res.status(200).json(updatedUser);
+                return res.status(200).json({message : `User with id ${user.id} has been deleted!`});
             }
             else
             {
@@ -80,6 +81,23 @@ user_router
         catch(err)
         {
             return res.status(500).json(err);
+        }
+    })
+
+user_router
+    .route('/users/projectMembers')
+    .get(async(req,res) => {
+        try{
+            const projectMembers = await User.findAll({
+                where: {
+                    type : "ProjectMember"
+                }
+            })
+            return res.status(200).json(projectMembers)
+        }
+        catch(err)
+        {
+            return res.status(404).json({message: 'ProjectMember type not found!'})
         }
     })
 
