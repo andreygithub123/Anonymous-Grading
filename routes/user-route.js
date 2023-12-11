@@ -64,5 +64,23 @@ user_router
             return res.status(500).json(err);
         }
     })
+    .delete(async(req,res)=> {
+        try{
+            const user = await User.findByPk(req.params.id);
+            if(user)
+            {
+                await user.destroy();
+                return res.status(200).json(updatedUser);
+            }
+            else
+            {
+                return res.status(404).json({message: `User with id ${req.params.id} not found!`});
+            }
+        }
+        catch(err)
+        {
+            return res.status(500).json(err);
+        }
+    })
 
 module.exports = user_router;
