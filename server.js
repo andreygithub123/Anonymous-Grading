@@ -6,11 +6,16 @@ const user_router = require("./routes/user-route");
 require('./models/user');
 const team_router = require("./routes/team-route");
 require('./models/team');
+const project_router = require("./routes/project-route");
+require('./models/project');
+
+
 
 const app = express();
 app.use(express.json());
 app.use("/", user_router);
 app.use("/", team_router);
+app.use("/",project_router);
 
 //use this when we want to precess the requests
 app.use( (req,res,next) => {//this a custom middleware function and has next()
