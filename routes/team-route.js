@@ -2,7 +2,7 @@ const { message } = require("statuses");
 const Team = require("../models/team");
 const User =require("../models/user");
 
-//User.belongsTo(Team);
+User.belongsTo(Team);
 Team.hasMany(User);
 
 
@@ -98,7 +98,7 @@ team_router
             });
             if(team)
             {
-                res.status(200).json(team.user);
+                res.status(200).json(team.Users);
             }
             else
             {
@@ -115,8 +115,9 @@ team_router
             const team  = await Team.findByPk(req.params.id);
             if(team)
             {
+                
                 const projectMember = new User(req.body);
-                projectMember.teamId = team.id;
+                projectMember.TeamId = team.id;
                 await projectMember.save();
                 res.status(200).json(projectMember);
             }

@@ -2,11 +2,6 @@ const sequelize = require("../sequelize");
 const {DataTypes} = require ('sequelize');
 
 const Team = sequelize.define("Team", {
-    teamId:{
-        type: DataTypes.INTEGER,
-        primaryKey:true,
-        autoIncrement:true,
-    },
     teamName :{
         type: DataTypes.STRING,
         allowNull:false,

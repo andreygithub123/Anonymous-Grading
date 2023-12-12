@@ -9,7 +9,7 @@ const sequelize = new Sequelize({
 
 sequelize
 .sync({
-    alter:true  //checks if the table exists already
+   alter:true  //checks if the table exists already
 })
 .then(() => {
     console.log("All models were syncronized successfully");
