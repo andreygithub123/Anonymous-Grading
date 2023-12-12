@@ -5,7 +5,6 @@ const Team = sequelize.define("Team", {
     id:{
         type: DataTypes.INTEGER,
         primaryKey:true,
-        allowNull:false,
         autoIncrement:true,
     },
     teamName :{
