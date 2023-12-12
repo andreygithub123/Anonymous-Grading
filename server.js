@@ -10,7 +10,6 @@ const project_router = require("./routes/project-route");
 require('./models/project');
 
 
-
 const app = express();
 app.use(express.json());
 app.use("/", user_router);
