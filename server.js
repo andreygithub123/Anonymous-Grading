@@ -24,7 +24,7 @@ app.use( (req,res,next) => {//this a custom middleware function and has next()
 })
 
 app.use( (err,req,res,next) => {        // handles servers errors
-    console.log('An error Ocurred!')        // logs the error into the console
+    console.log('An error Ocurred! : ' + err)        // logs the error into the console
     res.status(500).json({message: 'server error'}) // respnds with status code 500 and message 'server error'
 })
 

@@ -1,5 +1,10 @@
 const { message } = require("statuses");
 const Team = require("../models/team");
+const User =require("../models/user");
+
+//User.belongsTo(Team);
+Team.hasMany(User);
+
 
 const express = require("express");
 const team_router = express.Router();
@@ -82,6 +87,49 @@ team_router
         {
             next(err);
         }
+    })
+
+team_router
+    .route("/teams/:id/projectMembers")
+    .get(async (req,res,next) => {
+        try{
+            const team = await Team.findByPk(req.params.id, {
+                include:[User]
+            });
+            if(team)
+            {
+                res.status(200).json(team.user);
+            }
+            else
+            {
+                res.status(404).json( {message: `Team with id ${team.id} not found!`});
+            }
+        }
+        catch(err)
+        {
+            next(err);
+        }
+    })
+    .post(async (req,res,next)=>{
+        try{
+            const team  = await Team.findByPk(req.params.id);
+            if(team)
+            {
+                const projectMember = new User(req.body);
+                projectMember.teamId = team.id;
+                await projectMember.save();
+                res.status(200).json(projectMember);
+            }
+            else
+            {
+                res.status(404).json({message: `Team with id ${team.id} not found!`})
+            }
+        }
+        catch (err)
+        {
+            next(err);
+        }
+        
     })
 
 

@@ -33,11 +33,6 @@ const User = sequelize.define("User", {
             isIn: [['ProjectMember', 'Professor', 'Student']]
         },
     },
-    teamId:
-    {
-      type: DataTypes.INTEGER,
-      allowNull: true
-    },
     password : {
         type:DataTypes.STRING,
         allowNull:false
