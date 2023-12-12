@@ -6,31 +6,31 @@ const team_router = express.Router();
 
 team_router
     .route("/teams")
-    .get(async(req,res) => {
+    .get(async(req,res,next) => {
         try{
             const teams = await Team.findAll();
             return res.status(200).json(teams);
         }
         catch(err)
         {
-            return res.status(500).json(err);
+            next(err);
         }
     })
-    .post(async (req,res) => {
+    .post(async (req,res,next) => {
         try{
             const newTeam = await Team.create(req.body);
             return res.status(200).json(newTeam);
         }
         catch(err)
         {
-            return res.status(500).json(err)
+            next(err);
         }
     });
 
 
 team_router
     .route("/teams/:id")
-    .get(async(req,res) => {
+    .get(async(req,res,next) => {
         try{
             const team = await Team.findByPk(req.params.id);
             if(team)
@@ -44,10 +44,10 @@ team_router
         }
         catch(err)
         {
-            return res.status(500).json(err);
+            next(err);
         }
     })
-    .put(async(req,res) => {
+    .put(async(req,res,next) => {
         try{
             const team = await Team.findByPk(req.params.id);
             if(team)
@@ -62,10 +62,10 @@ team_router
         }
         catch(err)
         {
-            return res.status(500).json(err);
+            next(err);
         }
     })
-    .delete(async(req,res)=> {
+    .delete(async(req,res,next)=> {
         try{
             const team = await Team.findByPk(req.params.id);
             if(team)
@@ -80,7 +80,7 @@ team_router
         }
         catch(err)
         {
-            return res.status(500).json(err);
+            next(err);
         }
     })
 

@@ -6,7 +6,7 @@ const user_router = express.Router();
 
 user_router
     .route("/users")
-    .get(async(req,res) => {
+    .get(async(req,res,next) => {
         try{
             const users = await User.findAll();
             return res.status(200).json(users);
@@ -23,14 +23,14 @@ user_router
         }
         catch(err)
         {
-            return res.status(500).json(err)
+           next(err);
         }
     });
 
 
 user_router
     .route("/users/getById/:id")
-    .get(async(req,res) => {
+    .get(async(req,res,next) => {
         try{
             const user = await User.findByPk(req.params.id);
             if(user)
@@ -44,10 +44,10 @@ user_router
         }
         catch(err)
         {
-            return res.status(500).json(err);
+            next(err);
         }
     })
-    .put(async(req,res) => {
+    .put(async(req,res,next) => {
         try{
             const user = await User.findByPk(req.params.id);
             if(user)
@@ -62,10 +62,10 @@ user_router
         }
         catch(err)
         {
-            return res.status(500).json(err);
+            next(err);
         }
     })
-    .delete(async(req,res)=> {
+    .delete(async(req,res,next)=> {
         try{
             const user = await User.findByPk(req.params.id);
             if(user)
@@ -80,13 +80,13 @@ user_router
         }
         catch(err)
         {
-            return res.status(500).json(err);
+            next(err);
         }
     })
 
 user_router
     .route("/users/getByType/:type")
-    .get(async(req,res) => {
+    .get(async(req,res,next) => {
         try{
             const typeUsers = await User.findAll({
                 where: {
@@ -98,7 +98,7 @@ user_router
         }
         catch(err)
         {
-            return res.status(404).json({message: `${req.params.type} type not found!` })
+            next(err);
         }
     })
 
