@@ -88,7 +88,8 @@ team_router
             next(err);
         }
     })
-
+//route to put the Students into a Project
+//this creates also the Users objects 
 team_router
     .route("/teams/:id/projectMembers")
     .get(async (req,res,next) => {
