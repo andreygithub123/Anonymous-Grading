@@ -10,17 +10,29 @@ const User = sequelize.define("User", {
     },
     fullName :{
         type: DataTypes.STRING,
-        allowNull:false
+        allowNull:false,
+        validate: {
+            isNameSafe(value) {
+                // Validate that teamName does not contain harmful characters
+                const safePattern = /^[a-zA-Z0-9\s]+$/;
+                if (!safePattern.test(value)) {
+                    throw new Error('Invalid characters in user name');
+                }
+            },
+        },
     },
     email:{
         type:DataTypes.STRING,
         validate: {
-            isEmail:true,
+            isEmail:true
         },
     },
     type:{
         type: DataTypes.ENUM,
-        values: ['ProjectMember', 'Professor', 'Student']
+        values: ['ProjectMember', 'Professor', 'Student'],
+        validate: {
+            isIn: [['ProjectMember', 'Professor', 'Student']]
+        },
     },
     teamId:
     {
