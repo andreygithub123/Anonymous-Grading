@@ -25,7 +25,21 @@ user_router
         {
            next(err);
         }
+    })
+    .delete(async (req, res, next) => {
+        try {
+            // Delete all users from the database
+            await User.destroy({
+                where: {}, // Empty where clause deletes all records
+                truncate: true // Reset the auto-incrementing counter
+            });
+
+            return res.status(200).json({ message: 'All users deleted successfully' });
+        } catch (err) {
+            next(err);
+        }
     });
+    
 
 
 user_router
