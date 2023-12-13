@@ -120,7 +120,7 @@ team_router
             {
                 const projectMember = await User.create({
                     ...req.body,
-                    key : team.id,
+                    foreignKeyTeam : team.id,
                     TeamId :team.id
                 });
                 await projectMember.save();
@@ -167,7 +167,12 @@ team_router
             const team  = await Team.findByPk(req.params.id);
             if(team)
             {
-                const project = new Project(req.body);
+                const project = await Project.create({
+                    ...req.body,
+                    foreignKeyTeam : team.id,
+                    TeamId : team.id
+
+                });
                 project.TeamId = team.id;
                 const gradesArray = JSON.parse(project.grades).map(parseFloat);
                 console.log(gradesArray);

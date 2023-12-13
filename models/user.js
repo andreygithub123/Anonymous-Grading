@@ -37,7 +37,7 @@ const User = sequelize.define("User", {
         type:DataTypes.STRING,
         allowNull:false
     },
-    key: {
+    foreignKeyTeam: {
         type:DataTypes.INTEGER,
         allowNull:true,
     }
