@@ -116,22 +116,34 @@ team_router
             const team  = await Team.findByPk(req.params.id);
             if(team)
             {
-                
-                const projectMember = new User(req.body);
-                projectMember.TeamId = team.id;
-                await projectMember.save();
-                res.status(200).json(projectMember);
+
+                const projectMember = await User.create({
+                    ...req.body,
+                    TeamId:team.id
+                });
+                if(projectMember.type === 'ProjectMember')
+                {
+                    projectMember.TeamId=team.id;
+                    await projectMember.save();
+                    return res.status(200).json(projectMember);
+                }
+                else
+                {
+                    await projectMember.destroy();
+                    return res.status(405).json({message: 'type of the User is not projectMember!'});
+                }
+
             }
             else
             {
-                res.status(404).json({message: `Team with id ${team.id} not found!`})
+                res.status(404).json({message:`Team with id ${team.id} not found!`});
             }
         }
         catch (err)
         {
             next(err);
         }
-        
+
     })
 
 
