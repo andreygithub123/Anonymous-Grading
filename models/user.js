@@ -40,8 +40,12 @@ const User = sequelize.define("User", {
     foreignKeyTeam: {
         type:DataTypes.INTEGER,
         allowNull:true,
+    },
+    juryId : {
+        type:DataTypes.INTEGER,
+        defaultValue:null,
+        allowNull:true,
     }
-   
     
 });
 module.exports=User;

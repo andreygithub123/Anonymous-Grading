@@ -3,11 +3,12 @@ const sequelize = require("sequelize");
 
 //routers
 const user_router = require("./routes/user-route");
-require('./models/user');
+const User=require('./models/user');
 const team_router = require("./routes/team-route");
-require('./models/team');
+const Team=require('./models/team');
 const project_router = require("./routes/project-route");
-require('./models/project');
+const Project=require('./models/project');
+
 
 
 
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use("/", user_router);
 app.use("/", team_router);
 app.use("/",project_router);
+
 
 //use this when we want to precess the requests
 app.use( (req,res,next) => {//this a custom middleware function and has next()
@@ -27,6 +29,9 @@ app.use( (err,req,res,next) => {        // handles servers errors
     console.log('An error Ocurred! : ' + err)        // logs the error into the console
     res.status(500).json({message: 'server error'}) // respnds with status code 500 and message 'server error'
 })
+
+
+
 
 
 
