@@ -2,9 +2,6 @@ const { message } = require("statuses");
 const Team = require("../models/team");
 const User =require("../models/user");
 
-User.belongsTo(Team);
-Team.hasMany(User);
-
 
 const express = require("express");
 const team_router = express.Router();
@@ -116,10 +113,10 @@ team_router
             const team  = await Team.findByPk(req.params.id);
             if(team)
             {
-
                 const projectMember = new User(req.body);
                 projectMember.TeamId = team.id;
                 await projectMember.save();
+                console.log('project member saved ' )
                 res.status(200).json(projectMember);
             }
             else
