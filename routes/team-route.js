@@ -8,6 +8,7 @@ const { FLOAT } = require("sequelize");
 const team_router = express.Router();
 
 Team.hasMany(User);
+User.belongsTo(Team);
 Team.hasOne(Project);
 
 team_router
@@ -117,10 +118,13 @@ team_router
             const team  = await Team.findByPk(req.params.id);
             if(team)
             {
-                const projectMember = new User(req.body);
-                projectMember.TeamId = team.id;
+                const projectMember = await User.create({
+                    ...req.body,
+                    key : team.id,
+                    TeamId :team.id
+                });
                 await projectMember.save();
-                console.log('project member saved ' )
+                console.log(projectMember );
                 res.status(200).json(projectMember);
             }
             else
