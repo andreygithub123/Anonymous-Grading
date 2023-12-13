@@ -16,7 +16,7 @@ user_router
             return res.status(500).json(err);
         }
     })
-    .post(async (req,res) => {
+    .post(async (req,res,next) => {
         try{
             const newUser = await User.create(req.body);
             return res.status(200).json(newUser);
