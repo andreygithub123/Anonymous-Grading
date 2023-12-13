@@ -1,6 +1,5 @@
 const sequelize = require("../sequelize");
 const {DataTypes} = require ('sequelize');
-const User = require('../models/user');
 
 const Team = sequelize.define("Team", {
     teamName :{
@@ -26,6 +25,6 @@ Team.beforeCreate((team, options) => {
     team.teamName = sequelize.escape(team.teamName);
 });
 
-Team.hasMany(User, {foreignKey:'TeamId'});
+
 
 module.exports=Team;

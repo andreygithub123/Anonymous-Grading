@@ -1,10 +1,14 @@
 const { message } = require("statuses");
 const Team = require("../models/team");
 const User =require("../models/user");
-
+const Project = require('../models/project');
 
 const express = require("express");
+const { FLOAT } = require("sequelize");
 const team_router = express.Router();
+
+Team.hasMany(User);
+Team.hasOne(Project);
 
 team_router
     .route("/teams")
@@ -85,7 +89,7 @@ team_router
             next(err);
         }
     })
-//route to put the Students into a Project
+//route to put the ProjectMembers into a Team
 //this creates also the Users objects 
 team_router
     .route("/teams/:id/projectMembers")
@@ -118,6 +122,54 @@ team_router
                 await projectMember.save();
                 console.log('project member saved ' )
                 res.status(200).json(projectMember);
+            }
+            else
+            {
+                res.status(404).json({message: `Team with id ${team.id} not found!`})
+            }
+        }
+        catch (err)
+        {
+            next(err);
+        }
+
+    })
+
+//route to put the Project into a Team
+//this creates also the Project objects 
+team_router
+    .route("/teams/:id/addProject")
+    .get(async (req,res,next) => {
+        try{
+            const team = await Team.findByPk(req.params.id, {
+                include:[Project]
+            });
+            if(team)
+            {
+                res.status(200).json(team.Projects);
+            }
+            else
+            {
+                res.status(404).json( {message: `Team with id ${team.id} not found!`});
+            }
+        }
+        catch(err)
+        {
+            next(err);
+        }
+    })
+    .post(async (req,res,next)=>{
+        try{
+            const team  = await Team.findByPk(req.params.id);
+            if(team)
+            {
+                const project = new Project(req.body);
+                project.TeamId = team.id;
+                const gradesArray = JSON.parse(project.grades).map(parseFloat);
+                console.log(gradesArray);
+                await project.save();
+                console.log('project saved ' );
+                res.status(200).json(project);
             }
             else
             {
