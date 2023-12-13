@@ -15,10 +15,6 @@ const Team = sequelize.define("Team", {
             },
         },
     },
-    TeamId:{
-        type:DataTypes.INTEGER,
-        
-    },
     noMembers : {
         type: DataTypes.INTEGER
     }

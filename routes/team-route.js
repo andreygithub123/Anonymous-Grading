@@ -116,7 +116,7 @@ team_router
             const team  = await Team.findByPk(req.params.id);
             if(team)
             {
-                
+
                 const projectMember = new User(req.body);
                 projectMember.TeamId = team.id;
                 await projectMember.save();
@@ -131,7 +131,7 @@ team_router
         {
             next(err);
         }
-        
+
     })
 
 

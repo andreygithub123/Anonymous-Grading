@@ -37,9 +37,7 @@ const User = sequelize.define("User", {
         type:DataTypes.STRING,
         allowNull:false
     },
-    TeamId:{
-        type:DataTypes.INTEGER
-        }
+    
 });
 
 module.exports=User;
