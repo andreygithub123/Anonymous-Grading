@@ -2,8 +2,8 @@ const { message } = require("statuses");
 const User = require("../models/user");
 const express = require("express");
 const user_router = express.Router();
-const Team = require("../models/team")
 
+//Router for get/post/delete users 
 user_router
     .route("/users")
     .get(async (req, res, next) => {
@@ -39,7 +39,7 @@ user_router
     });
 
 
-
+//Router fot get/put(update)/delete users based on thier unique ID
 user_router
     .route("/users/getById/:id")
     .get(async (req, res, next) => {
@@ -87,6 +87,7 @@ user_router
         }
     })
 
+//Router to get all users with a specific type : [Student,ProjectMember,Professor]
 user_router
     .route("/users/getByType/:type")
     .get(async (req, res, next) => {
@@ -97,39 +98,14 @@ user_router
                 }
             })
             if (typeUsers)
-                return res.status(200).json(typeUsers)
+                return res.status(200).json(typeUsers);
+            else
+                return res.status(404).json({message:`Users with type ${req.params.type} not found!`});
         }
         catch (err) {
             next(err);
         }
     })
 
-user_router
-    .route('/jury')
-    .get(async (req, res, next) => {
-        try {
-            // Fetch users of type 'Student' or 'ProjectMember'
-            const typeUsers = await User.findAll({
-                where: {
-                    type: ['Student', 'ProjectMember']
-                }
-            });
-
-            if (typeUsers && typeUsers.length > 0) {
-                // Update isJury attribute to true for each user
-                await Promise.all(typeUsers.map(async (user) => {
-                    await user.update({ isJury: true });
-                }));
-
-                return res.status(200).json(typeUsers);
-            } else {
-                return res.status(404).json({ message: 'No students or project members found' });
-            }
-        } catch (err) {
-            next(err);
-        }
-    });
-
-
-
+    //export module to be used in server.js
 module.exports = user_router;

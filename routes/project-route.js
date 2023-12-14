@@ -1,11 +1,14 @@
 const { message } = require("statuses");
+//import modesl that are used in this route
 const Project = require("../models/project");
-const { Op } = require("sequelize");
 const User = require('../models/user');
-
+//express router
 const express = require("express");
 const project_router = express.Router();
+// import Operations Op from sequelize
+const { Op } = require("sequelize");
 
+//Router to get all/post in projects
 project_router
     .route("/projects")
     .get(async (req, res, next) => {
@@ -27,6 +30,7 @@ project_router
         }
     })
 
+//Router to get/put(update)/delete a project based on it's unique ID
 project_router
     .route("/projects/:id")
     .get(async (req, res, next) => {
@@ -43,7 +47,7 @@ project_router
         try {
             const project = await Project.findByPk(req.params.id);
             if (project) {
-                const updatedProject = await project.update(req.body);
+                const updatedProject = await project.update(req.body);  ///update the project with data from req.body
                 return res.status(200).json(updatedProject);
             }
             else { return res.status(404).json({ message: `Project with id ${req.params.id} not found` }); }
@@ -72,27 +76,25 @@ project_router
 project_router
     .route('/projects/:id/addJury')
     .get(async (req, res, next) => {
-        //filtrare 
-        //user id != project .id
-        // gen trb sa salvam la fiecare User care isJury un id al prooiectului respectiv
         try {
-            const allEligibleUsers = await User.findAll(
+            const allEligibleUsers = await User.findAll(    //find all Eligible Users to be a jury
                 {
                     where: {
-                        type: ['Student', 'ProjectMember'],
+                        type: ['Student', 'ProjectMember'],     // the user shoould be a Student/ProjectMember
                         foreignKeyTeam: {
-                            [Op.not]: req.params.id // Negating the condition for foreignKeyTeam
-                        }
+                            [Op.not]: req.params.id // Negating the condition for foreignKeyTeam // the User should not grade it's own project
+                        },
+                        juryId: null     //!!!!!!!! Daca User1 este atribuit ca juriu echipei 1 si dupa random il atribuie echipei 2, no sa mai fie in jury la echipa 1
                     }
                 })
             //test
-            if (allEligibleUsers) {
+            if (allEligibleUsers) {         //if we find those eligible users we need to form a jury of 4 made of random users 
                 const randomlySelectedUsers = getRandomId(allEligibleUsers, 4);
                 // Update the juryId attribute to the id of the project for each randomly selected user
                 await Promise.all(randomlySelectedUsers.map(async (user) => {
-                    await user.update({ juryId: req.params.id });
-                }));
-
+                    await user.update({ juryId: req.params.id });   //we update the field juryId with the id of the project
+                }));                                                // so each jury will be a jury to to a project
+                //!!!!!!!! Daca User1 este atribuit ca juriu echipei 1 si dupa random il atribuie echipei 2, no sa mai fie in jury la echipa 1
                 return res.status(200).json(randomlySelectedUsers);
             }
             else {
@@ -157,38 +159,53 @@ function getRandomId(usersArray, nbOfMembers) {
 
 
 project_router
-    .route("/projects/:projectId/jury/juryMember/:juryNo/putGrade")
+    .route("/projects/:projectId/putGrade")
     .post(async (req, res, next) => {
+        //The way to put the grades in the body of req
+        // {
+        //     "grades": "[1,2,3,4]"
+        //   }
         try {
-            const jury = await User.findAll(
+            // all jury for the project with id projectID
+            const juryProject = await User.findAll(
                 {
                     where: {
                         type: ['Student', 'ProjectMember'],
                         juryId: req.params.projectId
                     }
                 })
-
+            //get the rpoject with id = Url.id
             const project = await Project.findByPk(req.params.projectId);
             if (!project) {
                 return res.status(404).json({ error: `Project with id ${req.params.projectId} not found` });
             }
-            if (!jury[req.params.juryNo]) {
-                return res.status(404).json({ error: `There is no such jury member with number ${req.params.juryNo} for jury team ${req.params.juryId}`});
-            }
 
+            const gradesArray = JSON.parse(req.body.grades).map(parseFloat);
+            console.log(gradesArray);
+            const projectGradesAsFloatArray = [];
+            
+                for(let grade of gradesArray)
+                {
+                    putGrade(projectGradesAsFloatArray,grade);
+                }
+                
+            console.log(projectGradesAsFloatArray);
+           
+           
+           project.grades = JSON.stringify(projectGradesAsFloatArray);
+           await project.save();
 
-                const juryMember=jury[req.params.juryNo]; //Get the juryMember from request that will asign the grade
-                const gradeValue = req.params.grade; // Get the grade value from the request 
-
-          
-
-
+           return res.status(200).json(project);
         }
         catch (err) {
             next(err);
         }
 
     })
+ //const gradesArray = JSON.parse(project.grades).map(parseFloat);
+ function putGrade(projectGradesAsFloatArray,grade) {
+    projectGradesAsFloatArray.push(grade);
+}
 
 //export the router
 module.exports = project_router;

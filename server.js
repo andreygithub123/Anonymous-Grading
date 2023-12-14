@@ -1,7 +1,7 @@
 const express = require("express");
 const sequelize = require("sequelize");
 
-//routers
+//Import routes and models from the directory
 const user_router = require("./routes/user-route");
 const User=require('./models/user');
 const team_router = require("./routes/team-route");
@@ -11,7 +11,7 @@ const Project=require('./models/project');
 
 
 
-
+//Express for server + use separate routes for each model
 const app = express();
 app.use(express.json());
 app.use("/", user_router);
@@ -22,19 +22,19 @@ app.use("/",project_router);
 //use this when we want to precess the requests
 app.use( (req,res,next) => {//this a custom middleware function and has next()
     console.log(req.url)    //logs the urls of every request
-    next()                  //->After finishing this code,Pass control to the next middleware/route handler
+    next()                  //pass control to the next middleware/route handler
 })
 
 app.use( (err,req,res,next) => {        // handles servers errors
     console.log('An error Ocurred! : ' + err)        // logs the error into the console
-    res.status(500).json({message: 'server error'}) // respnds with status code 500 and message 'server error'
+    res.status(500).json({message: 'server error'}) // responds with status code 500 and message 'server error'
 })
 
 
 
 
 
-
+//Made app listen to port 8080
 app.listen(8080, async () => {
     console.log("Server started on http://localhost:8080");
     
