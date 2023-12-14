@@ -106,41 +106,99 @@ project_router
     })
 
 project_router
-    .route("/projects/:projectId/professor/:password/seeGrades")   
-    .get(async(req,res,next)=>{
-       try{
-        const professor = await User.findAll(
-            {
-                where: {
-                    type: ['Professor'],   
-                }
-            })
-        const project = await Project.findByPk(req.params.projectId);
-        if(professor[0].password === req.params.password ) 
-        {
-            //parse the gradesString array into a Float Array
-            const gradesArray = JSON.parse(project.grades).map(parseFloat);
-            return res.status(200).json(gradesArray); 
-            
-            //plus ca aici trb sa omiterm cea mai amre nota si cea mai mica
-            // si dupa sa facem media
-            //cum excluzi cea mai mare si cea mai mica asa le obtii ))) bn hai ceau
-            
+    .route("/projects/:projectId/professor/:password/seeGrades")
+    .get(async (req, res, next) => {
+        try {
+            const professor = await User.findAll(
+                {
+                    where: {
+                        type: ['Professor'],
+                    }
+                })
+            const project = await Project.findByPk(req.params.projectId);
+            if (professor[0].password === req.params.password) {
+                //parse the gradesString array into a Float Array
+                const gradesArray = JSON.parse(project.grades).map(parseFloat);
+                //return res.status(200).json(gradesArray); 
+
+                //get the average of the grades excluding the biggest and the smallest one
+                //functions to calculate the amx and the min of an array
+                Array.prototype.max = function () {
+                    return Math.max.apply(null, this);
+                };
+                Array.prototype.min = function () {
+                    return Math.min.apply(null, this);
+                };
+                //save the max and min into variables
+                const maxGrade = gradesArray.max();
+                const minGrade = gradesArray.min();
+                //exclude the biggesta nd smallest garde in the array
+                const excludedGrades = gradesArray.filter(grade => grade !== maxGrade && grade !== minGrade);
+                //calculate the average of the remaining values
+                const averageGrades = excludedGrades.reduce((a, b) => a + b, 0) / excludedGrades.length;
+                //return it 
+                return res.status(200).json({ gradesArray, averageGrades });
+            }
+            else {
+                return res.status(404).json({ message: 'The password is incorrect!' })//nu este 404 asta
+            }
         }
-        else
-        {
-            return res.status(404).json({message:'The password is incorrect!'})//nu este 404 asta
+        catch (err) {
+            next(err);
         }
-       }
-       catch(err)
-       {
-        next(err);
-       }
 
     })
 
-    function getRandomId(usersArray, nbOfMembers) {
-        const shuffledNames = [...usersArray].sort(() => Math.random() - 0.5);
-        return shuffledNames.slice(0, nbOfMembers); }
+//function to get random Id's from Users in order to create a jury
+function getRandomId(usersArray, nbOfMembers) {
+    const shuffledNames = [...usersArray].sort(() => Math.random() - 0.5);
+    return shuffledNames.slice(0, nbOfMembers);
+}
 
+
+project_router
+    .route("/projects/:projectId/jury/:juryId/putGrade")
+    .get(async (req, res, next) => {
+        try {
+            const professor = await User.findAll(
+                {
+                    where: {
+                        type: ['Professor'],
+                    }
+                })
+            const project = await Project.findByPk(req.params.projectId);
+            if (professor[0].password === req.params.password) {
+                //parse the gradesString array into a Float Array
+                const gradesArray = JSON.parse(project.grades).map(parseFloat);
+                //return res.status(200).json(gradesArray); 
+
+                //get the average of the grades excluding the biggest and the smallest one
+                //functions to calculate the amx and the min of an array
+                Array.prototype.max = function () {
+                    return Math.max.apply(null, this);
+                };
+                Array.prototype.min = function () {
+                    return Math.min.apply(null, this);
+                };
+                //save the max and min into variables
+                const maxGrade = gradesArray.max();
+                const minGrade = gradesArray.min();
+                //exclude the biggesta nd smallest garde in the array
+                const excludedGrades = gradesArray.filter(grade => grade !== maxGrade && grade !== minGrade);
+                //calculate the average of the remaining values
+                const averageGrades = excludedGrades.reduce((a, b) => a + b, 0) / excludedGrades.length;
+                //return it 
+                return res.status(200).json({ gradesArray, averageGrades });
+            }
+            else {
+                return res.status(404).json({ message: 'The password is incorrect!' })//nu este 404 asta
+            }
+        }
+        catch (err) {
+            next(err);
+        }
+
+    })
+
+//export the router
 module.exports = project_router;

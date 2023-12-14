@@ -16,7 +16,7 @@ const Project = sequelize.define("Project", {
         },
     },
     grades:{
-        type:DataTypes.TEXT
+        type:DataTypes.TEXT 
     },
     foreignKeyTeam: {
         type:DataTypes.INTEGER,
