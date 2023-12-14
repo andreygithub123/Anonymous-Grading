@@ -157,42 +157,32 @@ function getRandomId(usersArray, nbOfMembers) {
 
 
 project_router
-    .route("/projects/:projectId/jury/:juryId/putGrade")
-    .get(async (req, res, next) => {
+    .route("/projects/:projectId/jury/juryMember/:juryNo/putGrade")
+    .post(async (req, res, next) => {
         try {
-            const professor = await User.findAll(
+            const jury = await User.findAll(
                 {
                     where: {
-                        type: ['Professor'],
+                        type: ['Student', 'ProjectMember'],
+                        juryId: req.params.projectId
                     }
                 })
-            const project = await Project.findByPk(req.params.projectId);
-            if (professor[0].password === req.params.password) {
-                //parse the gradesString array into a Float Array
-                const gradesArray = JSON.parse(project.grades).map(parseFloat);
-                //return res.status(200).json(gradesArray); 
 
-                //get the average of the grades excluding the biggest and the smallest one
-                //functions to calculate the amx and the min of an array
-                Array.prototype.max = function () {
-                    return Math.max.apply(null, this);
-                };
-                Array.prototype.min = function () {
-                    return Math.min.apply(null, this);
-                };
-                //save the max and min into variables
-                const maxGrade = gradesArray.max();
-                const minGrade = gradesArray.min();
-                //exclude the biggesta nd smallest garde in the array
-                const excludedGrades = gradesArray.filter(grade => grade !== maxGrade && grade !== minGrade);
-                //calculate the average of the remaining values
-                const averageGrades = excludedGrades.reduce((a, b) => a + b, 0) / excludedGrades.length;
-                //return it 
-                return res.status(200).json({ gradesArray, averageGrades });
+            const project = await Project.findByPk(req.params.projectId);
+            if (!project) {
+                return res.status(404).json({ error: `Project with id ${req.params.projectId} not found` });
             }
-            else {
-                return res.status(404).json({ message: 'The password is incorrect!' })//nu este 404 asta
+            if (!jury[req.params.juryNo]) {
+                return res.status(404).json({ error: `There is no such jury member with number ${req.params.juryNo} for jury team ${req.params.juryId}`});
             }
+
+
+                const juryMember=jury[req.params.juryNo]; //Get the juryMember from request that will asign the grade
+                const gradeValue = req.params.grade; // Get the grade value from the request 
+
+          
+
+
         }
         catch (err) {
             next(err);
