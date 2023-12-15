@@ -107,20 +107,21 @@ project_router
 
     })
 
+    //Router to let the professor see the grades of a project and calculate automatically the avergae excluding the mina nd the amx from the gradsArray
 project_router
     .route("/projects/:projectId/professor/:password/seeGrades")
     .get(async (req, res, next) => {
         try {
-            const professor = await User.findAll(
+            const professor = await User.findAll(   // Our porject is made to run With only one professor
                 {
                     where: {
                         type: ['Professor'],
                     }
                 })
             const project = await Project.findByPk(req.params.projectId);
-            if (professor[0].password === req.params.password) {
-                //parse the gradesString array into a Float Array
-                const gradesArray = JSON.parse(project.grades).map(parseFloat);
+            if (professor[0].password === req.params.password) {                // If there are multiple professors logged in( by mistake an user loged in as professor)
+                //parse the gradesString array into a Float Array               // We will consider the first one logged in to be the professor
+                const gradesArray = JSON.parse(project.grades).map(parseFloat);         //The SQLITE does not allow to store arrays so i saved it as a string /then to parse it to obtain an array
                 //return res.status(200).json(gradesArray); 
 
                 //get the average of the grades excluding the biggest and the smallest one
@@ -157,7 +158,7 @@ function getRandomId(usersArray, nbOfMembers) {
     return shuffledNames.slice(0, nbOfMembers);
 }
 
-
+//Router to put grade for a project if you are Jury
 project_router
     .route("/projects/:projectId/putGrade")
     .post(async (req, res, next) => {
