@@ -100,12 +100,33 @@ user_router
             if (typeUsers)
                 return res.status(200).json(typeUsers);
             else
-                return res.status(404).json({message:`Users with type ${req.params.type} not found!`});
+                return res.status(404).json({ message: `Users with type ${req.params.type} not found!` });
         }
         catch (err) {
             next(err);
         }
     })
 
-    //export module to be used in server.js
+user_router
+    .route("/login")
+    .post(async (req, res, next) => {
+        const { email, password } = req.body;
+
+        try {
+            const user = await User.findOne({ where: { email: email } });
+
+            if (user && password === user.password) {
+                // Passwords match, consider the user as authenticated
+                return res.status(200).json({ message: 'Login successful' });
+            } else {
+                // Invalid email or password
+                return res.status(401).json({ message: 'Invalid email or password' });
+            }
+        } catch (error) {
+            next(error);
+        }
+    });
+
+
+//export module to be used in server.js
 module.exports = user_router;

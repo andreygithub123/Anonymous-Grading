@@ -1,5 +1,6 @@
 const express = require("express");
 const sequelize = require("sequelize");
+const cors = require("cors");
 
 //Import routes and models from the directory
 const user_router = require("./routes/user-route");
@@ -14,6 +15,7 @@ const Project=require('./models/project');
 //Express for server + use separate routes for each model
 const app = express();
 app.use(express.json());
+app.use(cors());
 app.use("/", user_router);
 app.use("/", team_router);
 app.use("/",project_router);
