@@ -4,6 +4,7 @@ const express = require("express");
 const user_router = express.Router();
 
 const jwt = require('jsonwebtoken');
+const JWT = require("./JWT");
 
 //Router for get/post/delete users 
 user_router
@@ -109,32 +110,6 @@ user_router
         }
     })
 
-// verify token middleware
-// trebuie pusa ca sa verifice .get/.post urile gen ca ele sa fie faculte de useru logat.
-// nu am pus o inca nicaieri sa verifice
-// decoded nu este implementata sa decodeze 
-// mai am din video de pe youtube
- const verifyJWT = (req,res,next) => {
-    const token = req.headers["x-access-token"];
-    if(!token)
-    {
-        res.status(404).json({message:" No token received"});
-    }
-    else
-    {
-        jwt.verify(token, "jwtSecret", (err,decoded) => {
-            if(err)
-            {
-                res.status(400).json({auth:false, message:"You failed to authenticate"});
-            }
-            else
-            {
-                req.userId = decoded.id;
-                next(); 
-            }
-        });
-    }
- }   
 
 user_router
     .route("/login")
@@ -147,11 +122,8 @@ user_router
             if (user && password === user.password) {
                 // Passwords match, consider the user as authenticated
 
-                //get the id of the user because we want to make the jwt by the id
-                const id = user.id;
-                const token = jwt.sign({id}, "jwtSecret", {
-                    expiresIn: 300,
-                })
+                //create a token using the function inJWT.js 
+                const token = JWT.createTokens(user);
                 return res.status(200).json({auth:true, token:token, result:user });
             } else {
                 // Invalid email or password
@@ -161,25 +133,28 @@ user_router
             next(error);
         }
     })
-    // aici nu e bine last inserted trb schimbat sa dea actualul user logat.
-    .get(async (req, res, next) => {
-        try {
-            const lastInsertedRecord = await User.findOne({
-                order: [['createdAt', 'DESC']] // Assuming 'createdAt' is your timestamp field
-
-            });
-
-            if (lastInsertedRecord)
-                return res.status(200).json(lastInsertedRecord);
-            else
-                return res.status(404).json({ message: `ERORRRRRR!` });
+    //aici nu e bine last inserted trb schimbat sa dea actualul user logat.
+    // .get(async (req, res, next) => {
+    //     const storageToken = token;
+    //     console.log(storageToken);
+    //     const userId = JWT.getIdFromToken(storageToken);
+    //     console.log(userId);
+    //     try{
+    //         const user = await User.findOne({where:{id:userId}})
+    //         if(user)
+    //         {
+    //             console.log(user);
+    //             return res.status(200).json(user);
+    //         }
+    //         else
+    //             return res.status(404).json({ message: `ERORRRRRR!` });
+    //     }
+    //     catch(err)
+    //     {
+    //         next(error);
+    //     }
         
-        } catch (error) {
-            next(error);
-        }   
-
-        
-    });
+    // });
 
 
 
