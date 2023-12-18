@@ -125,7 +125,27 @@ user_router
         } catch (error) {
             next(error);
         }
-    });
+    })
+    .get(async (req, res, next) => {
+        try {
+            const lastInsertedRecord = await User.findOne({
+                order: [['createdAt', 'DESC']] // Assuming 'createdAt' is your timestamp field
+
+            });
+
+            if (lastInsertedRecord)
+                return res.status(200).json(lastInsertedRecord);
+            else
+                return res.status(404).json({ message: `ERORRRRRR!` });
+        
+        } catch (error) {
+            next(error);
+        }   
+
+        
+    })
+
+
 
 
 //export module to be used in server.js
