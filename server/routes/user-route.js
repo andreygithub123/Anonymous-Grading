@@ -3,6 +3,8 @@ const User = require("../models/user");
 const express = require("express");
 const user_router = express.Router();
 
+const jwt = require('jsonwebtoken');
+
 //Router for get/post/delete users 
 user_router
     .route("/users")
@@ -117,7 +119,13 @@ user_router
 
             if (user && password === user.password) {
                 // Passwords match, consider the user as authenticated
-                return res.status(200).json({ message: 'Login successful' });
+
+                //get the id of the user because we want to make the jwt by the id
+                const id = user.id;
+                const token = jwt.sign({id}, "jwtSecret", {
+                    expiresIn: 300,
+                })
+                return res.status(200).json({auth:true, token:token, result:user });
             } else {
                 // Invalid email or password
                 return res.status(401).json({ message: 'Invalid email or password' });
@@ -125,7 +133,26 @@ user_router
         } catch (error) {
             next(error);
         }
+    })
+    .get(async (req, res, next) => {
+        try {
+            const lastInsertedRecord = await User.findOne({
+                order: [['createdAt', 'DESC']] // Assuming 'createdAt' is your timestamp field
+
+            });
+
+            if (lastInsertedRecord)
+                return res.status(200).json(lastInsertedRecord);
+            else
+                return res.status(404).json({ message: `ERORRRRRR!` });
+        
+        } catch (error) {
+            next(error);
+        }   
+
+        
     });
+
 
 
 //export module to be used in server.js
