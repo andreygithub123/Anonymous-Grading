@@ -109,6 +109,33 @@ user_router
         }
     })
 
+// verify token middleware
+// trebuie pusa ca sa verifice .get/.post urile gen ca ele sa fie faculte de useru logat.
+// nu am pus o inca nicaieri sa verifice
+// decoded nu este implementata sa decodeze 
+// mai am din video de pe youtube
+ const verifyJWT = (req,res,next) => {
+    const token = req.headers["x-access-token"];
+    if(!token)
+    {
+        res.status(404).json({message:" No token received"});
+    }
+    else
+    {
+        jwt.verify(token, "jwtSecret", (err,decoded) => {
+            if(err)
+            {
+                res.status(400).json({auth:false, message:"You failed to authenticate"});
+            }
+            else
+            {
+                req.userId = decoded.id;
+                next(); 
+            }
+        });
+    }
+ }   
+
 user_router
     .route("/login")
     .post(async (req, res, next) => {
@@ -134,6 +161,7 @@ user_router
             next(error);
         }
     })
+    // aici nu e bine last inserted trb schimbat sa dea actualul user logat.
     .get(async (req, res, next) => {
         try {
             const lastInsertedRecord = await User.findOne({

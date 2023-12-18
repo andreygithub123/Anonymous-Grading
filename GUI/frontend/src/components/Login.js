@@ -21,7 +21,8 @@ export const Login = () => {
         });
 
         console.log(response);
-
+        //save the token in the localStorage!
+        localStorage.setItem("token", "Bearer " +response.data.token);
         // Assuming the server responds with a success message or a token
         // You can set user authentication state or handle as needed
 
