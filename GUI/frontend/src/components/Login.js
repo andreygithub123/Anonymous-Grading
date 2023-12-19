@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import { Navigate } from 'react-router-dom'
+import { Navigate } from 'react-router-dom';
 
 
 export const Login = () => {
@@ -10,17 +10,20 @@ export const Login = () => {
   const [password, setPassword] = useState('');
   const [navigate, setNavigate] = useState(false);
 
+
   const submit = async e => {
     e.preventDefault();
 
     try {
-      console.log(email)
-      console.log(password)
         const response = await axios.post("http://localhost:8080/login", {
             email: email,
-            password: password,       
+            password: password
         });
 
+        console.log(response);
+        
+        //save the token in the localStorage!
+        localStorage.setItem("token", response.data.token);
         // Assuming the server responds with a success message or a token
         // You can set user authentication state or handle as needed
 
@@ -43,13 +46,13 @@ export const Login = () => {
 
       <div className="form-floating">
         <input type="email" className="form-control" id="floatingInput" placeholder="name@example.com"
-         onChange={e => setEmail(e.target.value)}/>
+        onChange={e => setEmail(e.target.value)} />
         <label htmlFor="floatingInput">Email address</label>
       </div>
 
       <div className="form-floating">
-        <input type="password" className="form-control" id="floatingPassword" placeholder="Password" 
-        onChange={e => setPassword(e.target.value)} />
+        <input type="password" className="form-control" id="floatingPassword" placeholder="Password"
+          onChange={e => setPassword(e.target.value)}/>
         <label htmlFor="floatingPassword">Password</label>
       </div>
 

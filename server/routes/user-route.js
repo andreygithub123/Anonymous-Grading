@@ -3,6 +3,9 @@ const User = require("../models/user");
 const express = require("express");
 const user_router = express.Router();
 
+const jwt = require('jsonwebtoken');
+const JWT = require("./JWT");
+
 //Router for get/post/delete users 
 user_router
     .route("/users")
@@ -107,6 +110,7 @@ user_router
         }
     })
 
+
 user_router
     .route("/login")
     .post(async (req, res, next) => {
@@ -117,7 +121,10 @@ user_router
 
             if (user && password === user.password) {
                 // Passwords match, consider the user as authenticated
-                return res.status(200).json({ message: 'Login successful' });
+
+                //create a token using the function inJWT.js 
+                const token = JWT.createTokens(user);
+                return res.status(200).json({auth:true, token:token, result:user });
             } else {
                 // Invalid email or password
                 return res.status(401).json({ message: 'Invalid email or password' });
@@ -126,25 +133,20 @@ user_router
             next(error);
         }
     })
+    //aici nu e bine last inserted trb schimbat sa dea actualul user logat.
     .get(async (req, res, next) => {
-        try {
-            const lastInsertedRecord = await User.findOne({
-                order: [['createdAt', 'DESC']] // Assuming 'createdAt' is your timestamp field
+        const token  =  req.headers["x-access-token"] ;
+        console.log(token);
 
-            });
-
-            if (lastInsertedRecord)
-                return res.status(200).json(lastInsertedRecord);
-            else
-                return res.status(404).json({ message: `ERORRRRRR!` });
-        
-        } catch (error) {
-            next(error);
-        }   
-
-        
-    })
-
+       try {
+        const userId = await JWT.getIdFromToken(token);
+        console.log(userId);
+        // Use userId for further processing
+    } catch (error) {
+        console.error('Error:', error);
+    }
+         
+    });
 
 
 

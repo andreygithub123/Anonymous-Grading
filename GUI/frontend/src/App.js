@@ -1,5 +1,5 @@
 import './App.css';
-import { BrowserRouter, Routes, Route,Link } from 'react-router-dom'
+import { BrowserRouter, Routes, Route,Link } from 'react-router-dom';
 import { Login } from "./components/Login";
 import { Register } from "./components/Register";
 import { Home } from "./components/Home";
@@ -21,6 +21,7 @@ function App() {
           <div className="text-end">
             <Link to="/login" className="btn btn-outline-light me-2">Login</Link>
             <Link to="/register" className="btn btn-outline-light me-2">Register</Link>
+            <Link to="" className="btn btn-outline-light me-2" onClick={() => localStorage.clear()}>Logout</Link>
           </div>
         </div>
       </div>
