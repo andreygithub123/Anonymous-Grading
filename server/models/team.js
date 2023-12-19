@@ -16,7 +16,8 @@ const Team = sequelize.define("Team", {
         },
     },
     noMembers : {
-        type: DataTypes.INTEGER
+        type: DataTypes.INTEGER,
+        allowNull:true
     }
   
 });

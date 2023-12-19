@@ -133,14 +133,13 @@ user_router
             next(error);
         }
     })
-    //aici nu e bine last inserted trb schimbat sa dea actualul user logat.
     .get(async (req, res, next) => {
         const token  =  req.headers["x-access-token"] ;
         console.log(token);
-
        try {
         const userId = await JWT.getIdFromToken(token);
         console.log(userId);
+        return res.status(200).json({userId:userId});
         // Use userId for further processing
     } catch (error) {
         console.error('Error:', error);

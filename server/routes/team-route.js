@@ -31,6 +31,7 @@ team_router
     .post(async (req,res,next) => {
         try{
             const newTeam = await Team.create(req.body);
+            console.log(newTeam);
             return res.status(200).json(newTeam);
         }
         catch(err)
