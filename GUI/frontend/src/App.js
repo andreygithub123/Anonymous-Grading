@@ -21,7 +21,6 @@ function App() {
           <div className="text-end">
             <Link to="/login" className="btn btn-outline-light me-2">Login</Link>
             <Link to="/register" className="btn btn-outline-light me-2">Register</Link>
-            <Link to="" className="btn btn-outline-light me-2" onClick={() => localStorage.clear()}>Logout</Link>
           </div>
         </div>
       </div>
