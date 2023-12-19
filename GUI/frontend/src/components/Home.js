@@ -7,6 +7,7 @@ export const Home = () => {
     const [teamName, setTeamName] = useState('');
     const [projectName, setProjectName] = useState('');
     const [navigate, setNavigate] = useState(false);
+    const [teamId,setTeamId] = useState('');
     const token = localStorage.getItem("token");
  
     const getIdToken = async (useToken) => {
@@ -33,9 +34,9 @@ export const Home = () => {
         console.log(teamName);
         if(token)
         {
-            let currentTeamId = null;
+           
             try {
-                if(teamName)
+                if(teamName && projectName)
                 {
                     const response = await axios.post("http://localhost:8080/teams", {
                         teamName: teamName
@@ -43,12 +44,9 @@ export const Home = () => {
             
                     // Check the response for success or any other relevant data
                     console.log("TeamResponse:", response.data);
-                    currentTeamId=response.data.id;
-                }
-               
-                if(projectName)
-                {
-                    const project = await axios.post(`http://localhost:8080/teams/${currentTeamId}/addProject`,{
+                    setTeamId(response.data.id);
+                
+                    const project = await axios.post(`http://localhost:8080/teams/${response.data.id}/addProject`,{
                         projectName:projectName
                     });
     
@@ -85,26 +83,23 @@ export const Home = () => {
             const userId = await getIdToken(token); 
             try {
                 const user = await axios.put(`http://localhost:8080/users/getById/${userId}`);
-                const updatedUser = {
-                    fullName: user.data.fullName,
-                    email : user.data.email,
-                    password : user.data.password
+                console.log(teamId);
+                const team =await axios.get(`http://localhost:8080/teams/${teamId}`)
+                const teamNameResponse = team.data.teamName;
+
+                if("'" + teamName +"'" === teamNameResponse)
+                {
+                    const response = await axios.post(`http://localhost:8080/teams/${teamId}/projectMembers`, {
+                        // fullName: user.data.fullName,
+                        // email : user.data.email,
+                        // password : user.data.password
+                        userId: userId
+                        });
+                
+                        // Check the response for success or any other relevant data
+                        console.log("Response:", response.data);
                 }
-
-
-                // const team =await axios.get("http://localhost:8080/teams/")
-                // const teamNameResponse = team.data.teamName;
-
-                // if(teamName  === teamNameResponse)
-                // {
-                // const response = await axios.post(`http://localhost:8080/teams/${NU_STIU*}/projectMembers`, {
-                //         updatedUser
-                //     });
-            
-                //     // Check the response for success or any other relevant data
-                //     console.log("Response:", response.data);
-                // }
-
+                
                 
             }
             catch(err)

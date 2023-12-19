@@ -132,15 +132,28 @@ team_router
         try{
             const team  = await Team.findByPk(req.params.id);
             if(team)
-            {                                                      //creates a new User with data from req.body
-                const projectMember = await User.create({       //initialize the TeamId and foreignKeyTeam with the team.id // 
-                    ...req.body,                                // foreingKeyTeam in order to persist the id after server is closed
-                    foreignKeyTeam : team.id,
-                    TeamId :team.id
-                });
-                await projectMember.save();                     // save the projectMember to persist in databse
-                console.log(projectMember );
-                res.status(200).json(projectMember);
+            {                 
+                const userId = req.body;
+                console.log(userId);
+                const user = await User.findOne({
+                    where: {
+                        id :userId.userId 
+                    }
+                })
+                if(user)
+                {
+                    await user.update({foreignKeyTeam: req.params.id});
+                }
+              
+                                               //creates a new User with data from req.body
+                // const projectMember = await User.create({       //initialize the TeamId and foreignKeyTeam with the team.id // 
+                //     ...req.body,                                // foreingKeyTeam in order to persist the id after server is closed
+                //     foreignKeyTeam : team.id,
+                //     TeamId :team.id
+                // });
+                // await projectMember.save();                     // save the projectMember to persist in databse
+                // console.log(projectMember );
+                // res.status(200).json(projectMember);
             }
             else
             {
