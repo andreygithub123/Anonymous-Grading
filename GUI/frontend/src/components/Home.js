@@ -4,14 +4,17 @@ import axios from "axios";
 export const Home = () => {
     const [name,setName] = useState('');
 
-    // useEffect (  () => {
-    //     (async() => {
-    //         const user = await axios.get ('http://localhost:8080/login');
-    //         console.log(user)
-    //     })();
-    // },  []);
-//     return <div className="form-signin mt-5 text-center">
-//         <h3>Hi {name}</h3>
-//     </div> 
+    const token = localStorage.getItem("token");
+ 
+    axios.get("http://localhost:8080/login", {
+        headers: {
+            "x-access-token" : token
+        }
+    })
+
+    return <div className="form-signin mt-5 text-center">
+        <h3>{token}</h3>
+    </div> 
 
  }
+

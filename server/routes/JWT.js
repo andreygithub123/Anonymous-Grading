@@ -2,27 +2,21 @@ const jwt = require('jsonwebtoken')
 
 const createTokens = (user) => {
     const accessToken = jwt.sign({id:user.id}, "jwtSecret", {
-        expiresIn: 300,
+        expiresIn: 500000,
     });
 
     return accessToken;
 }
 
-const getIdFromToken = (tokenFromStorage) => {
+const getIdFromToken = async (tokenFromStorage) => {
     const token = tokenFromStorage;
-    
-        jwt.verify(token,"jwtSecret", (err,decoded) => {
-            if(err)
-            {
-               console.log("Couldn't authenticate token!")
-            }
-            else
-            {
-                const userId = decoded.id;
-                console.log(userId);
-                return userId;
-            }
-        });
+    try {
+        const decoded = await jwt.verify(token, "jwtSecret");
+        return decoded.id;
+    } catch (err) {
+        console.log("Couldn't authenticate token!");
+        return null;
+    }
 }
 
 

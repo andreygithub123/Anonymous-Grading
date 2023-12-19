@@ -134,27 +134,19 @@ user_router
         }
     })
     //aici nu e bine last inserted trb schimbat sa dea actualul user logat.
-    // .get(async (req, res, next) => {
-    //     const storageToken = token;
-    //     console.log(storageToken);
-    //     const userId = JWT.getIdFromToken(storageToken);
-    //     console.log(userId);
-    //     try{
-    //         const user = await User.findOne({where:{id:userId}})
-    //         if(user)
-    //         {
-    //             console.log(user);
-    //             return res.status(200).json(user);
-    //         }
-    //         else
-    //             return res.status(404).json({ message: `ERORRRRRR!` });
-    //     }
-    //     catch(err)
-    //     {
-    //         next(error);
-    //     }
-        
-    // });
+    .get(async (req, res, next) => {
+        const token  =  req.headers["x-access-token"] ;
+        console.log(token);
+
+       try {
+        const userId = await JWT.getIdFromToken(token);
+        console.log(userId);
+        // Use userId for further processing
+    } catch (error) {
+        console.error('Error:', error);
+    }
+         
+    });
 
 
 
