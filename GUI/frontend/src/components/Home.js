@@ -41,8 +41,6 @@ export const Home = () => {
             if (response) {
               if (response.data.type === "Professor") {
                 setUserRole('Professor');
-              } else {
-                console.error("Couldn't find any user with type professor!");
               }
             } else {
               console.error("Couldn't find any user with that id!");
@@ -146,10 +144,10 @@ export const Home = () => {
         }
     }
 
-    const gradeProject= async e => {
-        e.preventDefault();
-        if(token)
-        {
+
+    
+
+
             // const userId = await getIdToken(token);
             // try {  
             //     const user = await axios.get(`http://localhost:8080/users/getById/${userId} `);
@@ -193,6 +191,48 @@ export const Home = () => {
             //     console.error(err);
             // }
             
+
+    const gradeProject= async e => {
+        e.preventDefault();
+        if(token)
+        {
+            const userId = await getIdToken(token);
+            try{
+                const user = await axios.put(`http://localhost:8080/users/getById/${userId}`, {
+                    gradeForProject : grade
+                });
+                //console.log(user.data.gradeForProject);
+                if(user)
+                {
+                    console.log(user.data);
+                    console.log(user.data.gradeForProject);
+                    const juryId = user.data.juryId;
+                    const projects =await axios.get("http://localhost:8080/projects")
+                    if(projects)
+                    {
+                        for(let i=1; i <= projects.data.length; i++) {
+                            let projectId = projects.data[i].id;
+                            if(projectId === juryId)
+                            {
+                                console.log(projectId);
+                                console.log(juryId);
+                                //post gardes
+                                 const response = await axios.post(`http://localhost:8080/projects/${projectId}/putGrade`,{
+                                    grades: grade
+                                 });
+                                 console.log(response);
+                            }
+                        }
+                    }else
+                    {
+                        console.error("No projects found!");
+                    }
+                }
+            }
+            catch(err)
+            {
+                console.log(err);
+            }
         }
     }
 
