@@ -345,9 +345,46 @@ export const Home = () => {
     if(token)
     {
         return (
-            <form style={{ maxWidth: "900px", margin: "auto" }}>
+            <form style={{ maxWidth: "1100px", margin: "auto" }}>
             <div className="text-center">
-                <div className="input-group input-group-lg mt-5">
+                
+
+                <div className="text-center mt-5">
+                <button className="btn btn-outline-danger" type="button" style={{fontSize:"25px"}} onClick={handleLogout}>LOG OUT</button>
+                <p className="logout-text">Use this to log out user</p>
+                </div>
+            
+                
+            </div>
+            
+            
+            <>
+                {userRole === 'Professor'   ? (
+                    
+                <div className="container">
+                    <div className="text-center mt-5">
+                        <button className="btn btn-outline-warning" type="button" style={{fontSize:"25px"}} onClick={generateJury}>GENERATE JURY</button>
+                        <button className="btn btn-outline-dark" type="button" style={{fontSize:"25px"}} onClick={gradesSeeCalculate}>DISPLAY / CALCULATE GRADES</button>
+                        <p className="professor-text">WORKS ONLY FOR PROFESSOR USER TYPE</p>
+                    </div>
+                     {/* Display grades section */}
+                        {displayGrades && (
+                            <div className="text-center mt-5">
+                            <h2>Display / Calculate Grades</h2>
+                            {displayProjectName.map((projectName, index) => (
+                                <div key={index}>
+                                <p>{projectName} | Livrabile: {displayLivrabilePartiale[index]} | Grades: {gradesArray[index].join(", ")} | Average Grade: {averageGrades[index]} </p>
+                              </div>
+                            ))}
+                     </div>
+                    )}
+                                    
+                </div>
+            ) : (
+
+                <div className="container">
+
+                <div className="input-group input-group-lg mt-5 text-center">
                     <span className="input-group-text" id="inputGroup-sizing-lg">Team name:</span>
                     <input
                         type="text"
@@ -370,12 +407,8 @@ export const Home = () => {
                     </div>
                 </div>
 
-                <div className="text-center mt-5">
-                <button className="btn btn-outline-danger" type="button" style={{fontSize:"25px"}} onClick={handleLogout}>LOG OUT</button>
-                <p className="logout-text">Use this to log out user</p>
-            </div>
-            
-                <div className="input-group input-group-lg mt-5">
+
+                        <div className="input-group input-group-lg mt-5">
                     <span className="input-group-text" id="inputGroup-sizing-lg">Name:</span>
                         <input
                             type="text"
@@ -400,32 +433,8 @@ export const Home = () => {
                     </div>  
                 </div>
                 <p>Use this to deliver a livrabil partial after the project is inserted!</p>
-            </div>
-            
-            
-            <>
-                {userRole === 'Professor'   ? (
-                <div className="container">
-                    <div className="text-center mt-5">
-                        <button className="btn btn-outline-warning" type="button" style={{fontSize:"25px"}} onClick={generateJury}>GENERATE JURY</button>
-                        <button className="btn btn-outline-dark" type="button" style={{fontSize:"25px"}} onClick={gradesSeeCalculate}>DISPLAY / CALCULATE GRADES</button>
-                        <p className="professor-text">WORKS ONLY FOR PROFESSOR USER TYPE</p>
-                    </div>
-                     {/* Display grades section */}
-                        {displayGrades && (
-                            <div className="text-center mt-5">
-                            <h2>Display / Calculate Grades</h2>
-                            {displayProjectName.map((projectName, index) => (
-                                <div key={index}>
-                                <p>{projectName} | Livrabile: {displayLivrabilePartiale[index]} | Grades: {gradesArray[index].join(", ")} | Average Grade: {averageGrades[index]} </p>
-                              </div>
-                            ))}
-                            </div>
-                        )}
-                                    
-                  </div>
-                ) : (
-                    <div className="text-center mt-5">
+
+                <div className="text-center mt-5">
                         <h2>Grade the Project</h2>
                         <p style={{backgroundColor:"red"}}>Grade only after the Professor generated the jury for each team!</p>
                         <p style={{backgroundColor:"lightblue"}}>Grades from 1 to 10</p>
@@ -446,6 +455,9 @@ export const Home = () => {
                         </div>
                     
                     </div>
+            </div>
+
+                   
                 )}
            </>
            
