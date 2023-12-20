@@ -6,7 +6,7 @@ const User = require('../models/user');
 const express = require("express");
 const project_router = express.Router();
 // import Operations Op from sequelize
-const { Op } = require("sequelize");
+const { Op, FLOAT } = require("sequelize");
 
 //Router to get all/post in projects
 project_router
@@ -165,39 +165,32 @@ project_router
     .post(async (req, res, next) => {
         //The way to put the grades in the body of req
         // {
-        //     "grades": "[1,2,3,4]"
+        //     "grades": "[1,2,3,4]"  // {grades: 10}
         //   }
         try {
-            // all jury for the project with id projectID
-            const juryProject = await User.findAll(
-                {
-                    where: {
-                        type: ['Student', 'ProjectMember'],
-                        juryId: req.params.projectId
-                    }
-                })
             //get the rpoject with id = Url.id
             const project = await Project.findByPk(req.params.projectId);
             if (!project) {
                 return res.status(404).json({ error: `Project with id ${req.params.projectId} not found` });
             }
-
-            const gradesArray = JSON.parse(req.body.grades).map(parseFloat);
-            console.log(gradesArray);
-            const projectGradesAsFloatArray = [];
+            const gradeAsFloat = parseFloat(req.body.grades);
+            console.log(gradeAsFloat);
+            // console.log(gradesArray);
+            // res.status(200).json(gradesArray);
+        //     const projectGradesAsFloatArray = [];
             
-                for(let grade of gradesArray)
-                {
-                    putGrade(projectGradesAsFloatArray,grade);
-                }
+        //         for(let grade of gradesArray)
+        //         {
+        //             putGrade(projectGradesAsFloatArray,grade);
+        //         }
                 
-            console.log(projectGradesAsFloatArray);
+        //     console.log(projectGradesAsFloatArray);
            
            
-           project.grades = JSON.stringify(projectGradesAsFloatArray);
-           await project.save();
+        //    project.grades = JSON.stringify(projectGradesAsFloatArray);
+        //    await project.save();
 
-           return res.status(200).json(project);
+        //    return res.status(200).json(project);
         }
         catch (err) {
             next(err);

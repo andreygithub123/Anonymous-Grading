@@ -1,15 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { Navigate } from "react-router-dom";
 
 export const Home = () => {
-    const [name,setName] = useState('');
     const [teamName, setTeamName] = useState('');
     const [projectName, setProjectName] = useState('');
     const [navigate, setNavigate] = useState(false);
-    const [teamId,setTeamId] = useState('');
     const token = localStorage.getItem("token");
- 
+    const [userRole, setUserRole] = useState('');
+    const [grade, setGrade] = useState('');
+
+   
     const getIdToken = async (useToken) => {
         try {
             if (useToken) {
@@ -28,6 +29,40 @@ export const Home = () => {
             // Handle errors if necessary
         }
     }
+
+    
+  
+
+    const isProffesor = useCallback(async () => {
+        if (token) {
+          const userId = await getIdToken(token);
+          try {
+            const response = await axios.get(`http://localhost:8080/users/getById/${userId}`);
+            if (response) {
+              if (response.data.type === "Professor") {
+                setUserRole('Professor');
+              }
+            } else {
+              console.error("Couldn't find any user with that id!");
+            }
+          } catch (err) {
+            console.error(err);
+          }
+        }
+      }, [token, getIdToken, setUserRole]);
+
+      useEffect(() => {
+        const checkUserRole = async () => {
+          if (token) {
+            await isProffesor(); // Call function to check if the user is a professor
+          }
+        };
+      
+        checkUserRole();
+      }, [token, isProffesor]);
+
+ 
+
    
     const addTeam= async e => {
         e.preventDefault();
@@ -106,6 +141,98 @@ export const Home = () => {
                 console.error(err);
             }
             
+        }
+    }
+
+
+    
+
+
+            // const userId = await getIdToken(token);
+            // try {  
+            //     const user = await axios.get(`http://localhost:8080/users/getById/${userId} `);
+            //     if(user)
+            //     {
+            //         const juryId = user.data.juryId;
+            //         const projects =await axios.get("http://localhost:8080/projects")
+            //         if(projects)
+            //         {
+            //             for(let i=0; i < projects.data.length; i++) {
+            //                 let projectId = projects.data[i].id;
+            //                 if(projectId === juryId)
+            //                 {
+            //                     //post gardes
+            //                      const response = await axios.post(`http://localhost:8080/projects/${projectId}/putGrade`,{
+            //                         grades: gradeProject
+            //                      });
+            //                 }
+            //                 else
+            //                 {
+
+            //                 }
+
+                           
+                            
+            //             }
+            //         }else
+            //         {
+            //             console.error("No projects found!");
+            //         }
+            //     }
+            //     else
+            //     {
+
+            //     }
+                
+                
+            // }
+            // catch(err)
+            // {
+            //     console.error(err);
+            // }
+            
+
+    const gradeProject= async e => {
+        e.preventDefault();
+        if(token)
+        {
+            const userId = await getIdToken(token);
+            try{
+                const user = await axios.put(`http://localhost:8080/users/getById/${userId}`, {
+                    gradeForProject : grade
+                });
+                //console.log(user.data.gradeForProject);
+                if(user)
+                {
+                    console.log(user.data);
+                    console.log(user.data.gradeForProject);
+                    const juryId = user.data.juryId;
+                    const projects =await axios.get("http://localhost:8080/projects")
+                    if(projects)
+                    {
+                        for(let i=1; i <= projects.data.length; i++) {
+                            let projectId = projects.data[i].id;
+                            if(projectId === juryId)
+                            {
+                                console.log(projectId);
+                                console.log(juryId);
+                                //post gardes
+                                 const response = await axios.post(`http://localhost:8080/projects/${projectId}/putGrade`,{
+                                    grades: grade
+                                 });
+                                 console.log(response);
+                            }
+                        }
+                    }else
+                    {
+                        console.error("No projects found!");
+                    }
+                }
+            }
+            catch(err)
+            {
+                console.log(err);
+            }
         }
     }
 
@@ -195,10 +322,38 @@ export const Home = () => {
                 <p className="logout-text">Use this to log out user</p>
             </div>
             
-            <div className="text-center mt-5">
-                <button className="btn btn-outline-warning" type="button" style={{fontSize:"25px"}} onClick={generateJury}>GENERATE JURY</button>
-                <p className="professor-text">WORKS ONLY FOR PROFESSOR USER TYPE</p>
-            </div>
+            <>
+                {userRole === 'Professor'   ? (
+                    <div className="text-center mt-5">
+                        <button className="btn btn-outline-warning" type="button" style={{fontSize:"25px"}} onClick={generateJury}>GENERATE JURY</button>
+                        <p className="professor-text">WORKS ONLY FOR PROFESSOR USER TYPE</p>
+                    </div>
+                ) : (
+                    <div className="text-center mt-5">
+                        <h2>Grade the Project</h2>
+                        <p style={{backgroundColor:"red"}}>Grade only after the Professor generated the jury for each team!</p>
+                        <p style={{backgroundColor:"lightblue"}}>Grades from 1 to 10</p>
+                        <div className="input-group input-group-lg mt-2">
+                            <span className="input-group-text" id="inputGroup-sizing-lg">Grade :</span>
+                            <input
+                            type="number"
+                            className="form-control"
+                            aria-label="Sizing example input"
+                            aria-describedby="inputGroup-sizing-lg"
+                            onChange={e=> setGrade(e.target.value)}
+                            min={1}
+                            max={10}
+                            />
+                            <div className="input-group-append ">
+                            <button className="btn btn-outline-primary " type="button" style={{fontSize:"25px"}} onClick={gradeProject}>SUBMIT GRADE</button>
+                            </div>
+                        </div>
+                    
+                    </div>
+                )}
+           </>
+
+
         </form>
                     
         );
