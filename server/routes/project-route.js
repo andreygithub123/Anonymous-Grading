@@ -81,9 +81,10 @@ project_router
                 {
                     where: {
                         type: ['Student', 'ProjectMember'],     // the user shoould be a Student/ProjectMember
-                        foreignKeyTeam: {
-                            [Op.not]: req.params.id // Negating the condition for foreignKeyTeam // the User should not grade it's own project
-                        },
+                        [Op.or]: [
+                            { foreignKeyTeam: { [Op.not]: req.params.id } }, // Check if it's not equal to req.params.id
+                            { foreignKeyTeam: { [Op.is]: null } } // Check if it's null
+                          ],
                         juryId: null     //!!!!!!!! Daca User1 este atribuit ca juriu echipei 1 si dupa random il atribuie echipei 2, no sa mai fie in jury la echipa 1
                     }
                 })

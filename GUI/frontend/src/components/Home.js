@@ -99,26 +99,46 @@ export const Home = () => {
                         console.log("Response:", response.data);
                     }
                 }
-
-
-
-
-
-
-
-                // if("'" + teamName +"'" === teamNameResponse)
-                // {
-                //     const response = await axios.post(`http://localhost:8080/teams/${teamId}/projectMembers`, {
-                //         // fullName: user.data.fullName,
-                //         // email : user.data.email,
-                //         // password : user.data.password
-                //         userId: userId
-                //         });
                 
-                //         // Check the response for success or any other relevant data
-                //         console.log("Response:", response.data);
-                // }
-                
+            }
+            catch(err)
+            {
+                console.error(err);
+            }
+            
+        }
+    }
+
+    const generateJury= async e => {
+        e.preventDefault();
+        if(token)
+        {
+            const userId = await getIdToken(token); 
+            try {
+                const user = await axios.put(`http://localhost:8080/users/getById/${userId}`);
+                if(user.data.type === "Professor")
+                {
+                    console.log("Professor clicked generateJury");
+                    const projects =await axios.get("http://localhost:8080/projects")
+                    if(projects)
+                    {
+                        for(let i=0; i < projects.data.length; i++) {
+                            let projectId = projects.data[i].id;
+                            const randomlySelectedUsers = await axios.get(`http://localhost:8080/projects/${projectId}/addJury`);
+                            console.log(`The randomly selected jury for project ${projects.data[i].projectName} are: \n`);
+                            console.log(randomlySelectedUsers.data);
+                            
+                        }
+                    }else
+                    {
+                        console.error("No projects found!");
+                    }
+                  
+                }
+                else
+                {
+                    console.error("You try to generate the jury with type Studetn/PM. Log in as professor")
+                }
                 
             }
             catch(err)
@@ -165,12 +185,20 @@ export const Home = () => {
                         onChange={e=> setProjectName(e.target.value)}
                     />
                     <div className="input-group-append ">
-                        <button className="btn btn-outline-secondary " type="button" onClick={addTeam}>Add</button>
-                        <button className="btn btn-outline-secondary " type="button" onClick={joinTeam}>Join</button>
+                        <button className="btn btn-outline-success " type="button" style={{fontSize:"25px"}} onClick={addTeam}>ADD</button>
+                        <button className="btn btn-outline-primary " type="button" style={{fontSize:"25px"}} onClick={joinTeam}>JOIN</button>
                     </div>
                 </div>
             </div>
-            <button className="btn btn-outline-secondary" type="button" onClick={handleLogout}>LOG OUT</button>
+            <div className="text-center mt-5">
+                <button className="btn btn-outline-danger" type="button" style={{fontSize:"25px"}} onClick={handleLogout}>LOG OUT</button>
+                <p className="logout-text">Use this to log out user</p>
+            </div>
+            
+            <div className="text-center mt-5">
+                <button className="btn btn-outline-warning" type="button" style={{fontSize:"25px"}} onClick={generateJury}>GENERATE JURY</button>
+                <p className="professor-text">WORKS ONLY FOR PROFESSOR USER TYPE</p>
+            </div>
         </form>
                     
         );
