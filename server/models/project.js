@@ -22,6 +22,10 @@ const Project = sequelize.define("Project", {
     foreignKeyTeam: {
         type:DataTypes.INTEGER,
         allowNull:true,
+    },
+    livrabilPartial : {
+        type:DataTypes.STRING,
+        defaultValue: "No livrabil partial"
     }
 });
 

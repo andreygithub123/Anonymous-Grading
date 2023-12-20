@@ -45,6 +45,11 @@ const User = sequelize.define("User", {
         type:DataTypes.INTEGER,
         defaultValue:null,
         allowNull:true,
+    },
+    gradeForProject : {
+        type:DataTypes.INTEGER,
+        defaultValue:null,
+        allowNull:true,
     }
     
 });

@@ -6,7 +6,7 @@ const User = require('../models/user');
 const express = require("express");
 const project_router = express.Router();
 // import Operations Op from sequelize
-const { Op } = require("sequelize");
+const { Op, FLOAT } = require("sequelize");
 
 //Router to get all/post in projects
 project_router
@@ -81,9 +81,10 @@ project_router
                 {
                     where: {
                         type: ['Student', 'ProjectMember'],     // the user shoould be a Student/ProjectMember
-                        foreignKeyTeam: {
-                            [Op.not]: req.params.id // Negating the condition for foreignKeyTeam // the User should not grade it's own project
-                        },
+                        [Op.or]: [
+                            { foreignKeyTeam: { [Op.not]: req.params.id } }, // Check if it's not equal to req.params.id
+                            { foreignKeyTeam: { [Op.is]: null } } // Check if it's null
+                          ],
                         juryId: null     //!!!!!!!! Daca User1 este atribuit ca juriu echipei 1 si dupa random il atribuie echipei 2, no sa mai fie in jury la echipa 1
                     }
                 })
@@ -164,39 +165,48 @@ project_router
     .post(async (req, res, next) => {
         //The way to put the grades in the body of req
         // {
-        //     "grades": "[1,2,3,4]"
+        //     "grades": "[1,2,3,4]"  // {grades: 10}
         //   }
         try {
-            // all jury for the project with id projectID
-            const juryProject = await User.findAll(
-                {
-                    where: {
-                        type: ['Student', 'ProjectMember'],
-                        juryId: req.params.projectId
-                    }
-                })
             //get the rpoject with id = Url.id
             const project = await Project.findByPk(req.params.projectId);
             if (!project) {
                 return res.status(404).json({ error: `Project with id ${req.params.projectId} not found` });
             }
 
-            const gradesArray = JSON.parse(req.body.grades).map(parseFloat);
-            console.log(gradesArray);
-            const projectGradesAsFloatArray = [];
-            
-                for(let grade of gradesArray)
-                {
-                    putGrade(projectGradesAsFloatArray,grade);
-                }
-                
-            console.log(projectGradesAsFloatArray);
-           
-           
-           project.grades = JSON.stringify(projectGradesAsFloatArray);
-           await project.save();
+            const gradeAsInteger = parseFloat(req.body.grades);
+            console.log(gradeAsInteger);
+            console.log(project.grades);
 
-           return res.status(200).json(project);
+            if (project.grades === '') {
+                project.grades = JSON.stringify(gradeAsInteger);
+            } else {
+
+                let intArray = JSON.parse(project.grades);
+                console.log(intArray);
+                console.log(typeof intArray);
+
+
+                //if 2 or more elements in grades : project.grades => int array
+                //console.log(intArray); // Output: [5, 3]
+                if (typeof intArray === 'object') {
+                    console.log(gradeAsInteger);
+                    console.log(typeof intArray);
+                    intArray.push(gradeAsInteger);
+                    console.log(intArray);
+                    project.grades = JSON.stringify(intArray);
+                }
+                else if (typeof intArray === 'number') { //1 element case : project.grades => number
+                    const resultArray = [];
+                    resultArray.push(intArray);
+                    resultArray.push(gradeAsInteger);
+                    project.grades = JSON.stringify(resultArray);
+                }
+
+            }
+
+            await project.save();
+            return res.status(200).json(project);
         }
         catch (err) {
             next(err);

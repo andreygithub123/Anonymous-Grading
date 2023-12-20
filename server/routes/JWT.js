@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken')
 
 const createTokens = (user) => {
     const accessToken = jwt.sign({id:user.id}, "jwtSecret", {
-        expiresIn: 500000,
+        expiresIn: 500000,   //500000
     });
 
     return accessToken;
