@@ -44,7 +44,8 @@ export const Home = () => {
             
                     // Check the response for success or any other relevant data
                     console.log("TeamResponse:", response.data);
-                    setTeamId(response.data.id);
+                    //setTeamId(response.data.id);
+                    //localStorage.setItem('teamId', response.data.id);
                 
                     const project = await axios.post(`http://localhost:8080/teams/${response.data.id}/addProject`,{
                         projectName:projectName
@@ -82,23 +83,41 @@ export const Home = () => {
             setUserAsPM(token);
             const userId = await getIdToken(token); 
             try {
-                const user = await axios.put(`http://localhost:8080/users/getById/${userId}`);
-                console.log(teamId);
-                const team =await axios.get(`http://localhost:8080/teams/${teamId}`)
-                const teamNameResponse = team.data.teamName;
-
-                if("'" + teamName +"'" === teamNameResponse)
-                {
-                    const response = await axios.post(`http://localhost:8080/teams/${teamId}/projectMembers`, {
-                        // fullName: user.data.fullName,
-                        // email : user.data.email,
-                        // password : user.data.password
+                // const user = await axios.put(`http://localhost:8080/users/getById/${userId}`);
+                //setTeamId(localStorage.getItem("teamId"));    
+                const teams =await axios.get("http://localhost:8080/teams")
+                for(let i=0; i < teams.data.length; i++) {
+                    let team = teams.data[i];
+                    if(team.teamName === "'" + teamName +"'")
+                    {
+                        console.log("User added in " + teamName);
+                        const response = await axios.post(`http://localhost:8080/teams/${team.id}/projectMembers`, {
                         userId: userId
                         });
                 
                         // Check the response for success or any other relevant data
                         console.log("Response:", response.data);
+                    }
                 }
+
+
+
+
+
+
+
+                // if("'" + teamName +"'" === teamNameResponse)
+                // {
+                //     const response = await axios.post(`http://localhost:8080/teams/${teamId}/projectMembers`, {
+                //         // fullName: user.data.fullName,
+                //         // email : user.data.email,
+                //         // password : user.data.password
+                //         userId: userId
+                //         });
+                
+                //         // Check the response for success or any other relevant data
+                //         console.log("Response:", response.data);
+                // }
                 
                 
             }
