@@ -165,7 +165,7 @@ project_router
     .post(async (req, res, next) => {
         //The way to put the grades in the body of req
         // {
-        //     "grades": "[1,2,3,4]"
+        //     "grades": "[1,2,3,4]" 
         //   }
         try {
             // all jury for the project with id projectID
