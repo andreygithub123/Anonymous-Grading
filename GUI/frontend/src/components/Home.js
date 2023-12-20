@@ -14,6 +14,10 @@ export const Home = () => {
     const [gradesArray, setGradesArray] = useState([]);
     const [averageGrades, setAverageGrades] = useState([]);
     const [displayProjectName, setDisplayProjectName] = useState([]);
+    const [displayLivrabilePartiale, setDisplayLivrabilePartiale] = useState([]);
+
+    const [livrabilPartial, setLivrabilPartial] = useState('');
+    const [projectNameLivrabil, setProjectNameLivrabil] = useState('');
 
    
     const getIdToken = async (useToken) => {
@@ -148,6 +152,39 @@ export const Home = () => {
             
         }
     }
+
+    const addLivrabilPartial= async e => {
+        e.preventDefault();
+        if(token)
+        {
+            try{
+                const projects = await axios.get("http://localhost:8080/projects")
+                if(projects)
+                {
+                    for(let i=0; i < projects.data.length; i++) {
+                        let projectName = projects.data[i].projectName;
+                        if(projectName === projectNameLivrabil)
+                        {
+                            let projectId = projects.data[i].id;
+                            const projectLivrabil = await axios.put(`http://localhost:8080/projects/${projectId}`,{
+                                livrabilPartial: livrabilPartial
+                            });
+                            console.log(projectLivrabil.data);
+                        }
+                    }
+                }
+                else
+                {
+                    console.error("No projects found!");
+                }
+
+            }
+            catch(err)
+            {
+                console.error(err);
+            }
+        }
+    }
             
 
     const gradeProject= async e => {
@@ -251,6 +288,7 @@ export const Home = () => {
                         const allGrades = []; // Array to hold all project grades
                         const allAverages = []; // Array to hold all average grades
                         const allProjectNames = []; // Array to hold all proj names
+                        const allLivrabilePartiale = [];
                         for(let i=0; i < projects.data.length; i++) {
                              let projectId = projects.data[i].id;
                              const projectGrades = await axios.get(`http://localhost:8080/projects/${projectId}/professor/${profPassword}/seeGrades`);
@@ -262,12 +300,14 @@ export const Home = () => {
                             allProjectNames.push(projects.data[i].projectName);
                             allGrades.push(projectGrades.data.gradesArray);
                             allAverages.push(projectGrades.data.averageGrades);
+                            allLivrabilePartiale.push(projects.data[i].livrabilPartial);
 
                            
                         }
                         setGradesArray(allGrades);
                         setAverageGrades(allAverages);
                         setDisplayProjectName(allProjectNames);
+                        setDisplayLivrabilePartiale(allLivrabilePartiale);
                         setDisplayGrades(true);
                     }else
                     {
@@ -329,11 +369,39 @@ export const Home = () => {
                         <button className="btn btn-outline-primary " type="button" style={{fontSize:"25px"}} onClick={joinTeam}>JOIN</button>
                     </div>
                 </div>
-            </div>
-            <div className="text-center mt-5">
+
+                <div className="text-center mt-5">
                 <button className="btn btn-outline-danger" type="button" style={{fontSize:"25px"}} onClick={handleLogout}>LOG OUT</button>
                 <p className="logout-text">Use this to log out user</p>
             </div>
+            
+                <div className="input-group input-group-lg mt-5">
+                    <span className="input-group-text" id="inputGroup-sizing-lg">Name:</span>
+                        <input
+                            type="text"
+                            className="form-control"
+                            placeholder="USE THIS AFTER PROJECT IS DEFINED!"
+                            aria-label="Sizing example input"
+                            aria-describedby="inputGroup-sizing-lg"
+                            style={{maxWidth: "200px"}}
+                            onChange={e=> setProjectNameLivrabil(e.target.value)}
+                        />
+                     <span className="input-group-text" id="inputGroup-sizing-lg">Livrabil:</span>
+                        <input
+                            type="text"
+                            className="form-control"
+                            placeholder="USE THIS AFTER PROJECT IS DEFINED!"
+                            aria-label="Sizing example input"
+                            aria-describedby="inputGroup-sizing-lg"
+                            onChange={e=> setLivrabilPartial(e.target.value)}
+                        />
+                    <div className="input-group-append ">
+                        <button className="btn btn-outline-success " type="button" style={{fontSize:"25px"}} onClick={addLivrabilPartial}>-</button>
+                    </div>  
+                </div>
+                <p>Use this to deliver a livrabil partial after the project is inserted!</p>
+            </div>
+            
             
             <>
                 {userRole === 'Professor'   ? (
@@ -349,7 +417,7 @@ export const Home = () => {
                             <h2>Display / Calculate Grades</h2>
                             {displayProjectName.map((projectName, index) => (
                                 <div key={index}>
-                                <p>{projectName} | Grades: {gradesArray[index].join(", ")} | Average Grade: {averageGrades[index]} </p>
+                                <p>{projectName} | Livrabile: {displayLivrabilePartiale[index]} | Grades: {gradesArray[index].join(", ")} | Average Grade: {averageGrades[index]} </p>
                               </div>
                             ))}
                             </div>
