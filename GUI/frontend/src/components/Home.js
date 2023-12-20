@@ -10,6 +10,12 @@ export const Home = () => {
     const [userRole, setUserRole] = useState('');
     const [grade, setGrade] = useState('');
 
+    const [displayGrades, setDisplayGrades] = useState(false);
+    const [projectInfo,setProjectInfo] = useState([]);
+    const [gradesArray, setGradesArray] = useState([]);
+    const [averageGrades, setAverageGrades] = useState(0);
+    const [displayProjectName, setDisplayProjectName] = useState('');
+
    
     const getIdToken = async (useToken) => {
         try {
@@ -143,53 +149,6 @@ export const Home = () => {
             
         }
     }
-
-
-    
-
-
-            // const userId = await getIdToken(token);
-            // try {  
-            //     const user = await axios.get(`http://localhost:8080/users/getById/${userId} `);
-            //     if(user)
-            //     {
-            //         const juryId = user.data.juryId;
-            //         const projects =await axios.get("http://localhost:8080/projects")
-            //         if(projects)
-            //         {
-            //             for(let i=0; i < projects.data.length; i++) {
-            //                 let projectId = projects.data[i].id;
-            //                 if(projectId === juryId)
-            //                 {
-            //                     //post gardes
-            //                      const response = await axios.post(`http://localhost:8080/projects/${projectId}/putGrade`,{
-            //                         grades: gradeProject
-            //                      });
-            //                 }
-            //                 else
-            //                 {
-
-            //                 }
-
-                           
-                            
-            //             }
-            //         }else
-            //         {
-            //             console.error("No projects found!");
-            //         }
-            //     }
-            //     else
-            //     {
-
-            //     }
-                
-                
-            // }
-            // catch(err)
-            // {
-            //     console.error(err);
-            // }
             
 
     const gradeProject= async e => {
@@ -210,7 +169,7 @@ export const Home = () => {
                     const projects =await axios.get("http://localhost:8080/projects")
                     if(projects)
                     {
-                        for(let i=1; i <= projects.data.length; i++) {
+                        for(let i=0; i < projects.data.length; i++) {
                             let projectId = projects.data[i].id;
                             if(projectId === juryId)
                             {
@@ -255,6 +214,54 @@ export const Home = () => {
                             console.log(`The randomly selected jury for project ${projects.data[i].projectName} are: \n`);
                             console.log(randomlySelectedUsers.data);
                             
+                        }
+                    }else
+                    {
+                        console.error("No projects found!");
+                    }
+                  
+                }
+                else
+                {
+                    console.error("You try to generate the jury with type Studetn/PM. Log in as professor")
+                }
+                
+            }
+            catch(err)
+            {
+                console.error(err);
+            }
+            
+        }
+    }
+
+  //setProjectInfo([displayGrades,gradesArray,averageGrades]);
+    const gradesSeeCalculate= async e => {
+        e.preventDefault();
+        if(token)
+        {
+            const userId = await getIdToken(token); 
+            try {
+                const user = await axios.put(`http://localhost:8080/users/getById/${userId}`);
+                if(user.data.type === "Professor")
+                {
+                    const profPassword = user.data.password;
+                    const projects =await axios.get("http://localhost:8080/projects")
+                    if(projects)
+                    {
+                        for(let i=0; i < projects.data.length; i++) {
+                             let projectId = projects.data[i].id;
+                             const projectGrades = await axios.get(`http://localhost:8080/projects/${projectId}/professor/${profPassword}/seeGrades`);
+                             //{ gradesArray, averageGrades }
+                            console.log(`The grades of the project with id : ${projectId} : `);
+                            console.log(projectGrades.data.gradesArray);
+                            setGradesArray(projectGrades.data.gradesArray);
+                            console.log(projectGrades.data.averageGrades);
+                            setAverageGrades(projectGrades.data.averageGrades);
+                            setDisplayGrades(true);
+                            setDisplayProjectName(projects.data[i].projectName);
+                            console.log(projects.data[i].projectName);
+                           
                         }
                     }else
                     {
@@ -324,10 +331,22 @@ export const Home = () => {
             
             <>
                 {userRole === 'Professor'   ? (
+                <div className="container">
                     <div className="text-center mt-5">
                         <button className="btn btn-outline-warning" type="button" style={{fontSize:"25px"}} onClick={generateJury}>GENERATE JURY</button>
+                        <button className="btn btn-outline-dark" type="button" style={{fontSize:"25px"}} onClick={gradesSeeCalculate}>DISPLAY / CALCULATE GRADES</button>
                         <p className="professor-text">WORKS ONLY FOR PROFESSOR USER TYPE</p>
                     </div>
+                     {/* Display grades section */}
+                        {displayGrades && (
+                            <div className="text-center mt-5">
+                            <h2>Display / Calculate Grades</h2>
+                            <p> {displayProjectName} has the grades : {gradesArray.join(", ")} and the avergage : {averageGrades}</p>
+                            
+                            </div>
+                        )}
+                                    
+                  </div>
                 ) : (
                     <div className="text-center mt-5">
                         <h2>Grade the Project</h2>
@@ -352,6 +371,7 @@ export const Home = () => {
                     </div>
                 )}
            </>
+           
 
 
         </form>

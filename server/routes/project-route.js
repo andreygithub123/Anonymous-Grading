@@ -173,24 +173,40 @@ project_router
             if (!project) {
                 return res.status(404).json({ error: `Project with id ${req.params.projectId} not found` });
             }
-            const gradeAsFloat = parseFloat(req.body.grades);
-            console.log(gradeAsFloat);
-            // console.log(gradesArray);
-            // res.status(200).json(gradesArray);
-        //     const projectGradesAsFloatArray = [];
-            
-        //         for(let grade of gradesArray)
-        //         {
-        //             putGrade(projectGradesAsFloatArray,grade);
-        //         }
-                
-        //     console.log(projectGradesAsFloatArray);
-           
-           
-        //    project.grades = JSON.stringify(projectGradesAsFloatArray);
-        //    await project.save();
 
-        //    return res.status(200).json(project);
+            const gradeAsInteger = parseFloat(req.body.grades);
+            console.log(gradeAsInteger);
+            console.log(project.grades);
+
+            if (project.grades === '') {
+                project.grades = JSON.stringify(gradeAsInteger);
+            } else {
+
+                let intArray = JSON.parse(project.grades);
+                console.log(intArray);
+                console.log(typeof intArray);
+
+
+                //if 2 or more elements in grades : project.grades => int array
+                //console.log(intArray); // Output: [5, 3]
+                if (typeof intArray === 'object') {
+                    console.log(gradeAsInteger);
+                    console.log(typeof intArray);
+                    intArray.push(gradeAsInteger);
+                    console.log(intArray);
+                    project.grades = JSON.stringify(intArray);
+                }
+                else if (typeof intArray === 'number') { //1 element case : project.grades => number
+                    const resultArray = [];
+                    resultArray.push(intArray);
+                    resultArray.push(gradeAsInteger);
+                    project.grades = JSON.stringify(resultArray);
+                }
+
+            }
+
+            await project.save();
+            return res.status(200).json(project);
         }
         catch (err) {
             next(err);
