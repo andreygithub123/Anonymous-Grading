@@ -11,10 +11,9 @@ export const Home = () => {
     const [grade, setGrade] = useState('');
 
     const [displayGrades, setDisplayGrades] = useState(false);
-    const [projectInfo,setProjectInfo] = useState([]);
     const [gradesArray, setGradesArray] = useState([]);
-    const [averageGrades, setAverageGrades] = useState(0);
-    const [displayProjectName, setDisplayProjectName] = useState('');
+    const [averageGrades, setAverageGrades] = useState([]);
+    const [displayProjectName, setDisplayProjectName] = useState([]);
 
    
     const getIdToken = async (useToken) => {
@@ -249,20 +248,27 @@ export const Home = () => {
                     const projects =await axios.get("http://localhost:8080/projects")
                     if(projects)
                     {
+                        const allGrades = []; // Array to hold all project grades
+                        const allAverages = []; // Array to hold all average grades
+                        const allProjectNames = []; // Array to hold all proj names
                         for(let i=0; i < projects.data.length; i++) {
                              let projectId = projects.data[i].id;
                              const projectGrades = await axios.get(`http://localhost:8080/projects/${projectId}/professor/${profPassword}/seeGrades`);
                              //{ gradesArray, averageGrades }
                             console.log(`The grades of the project with id : ${projectId} : `);
-                            console.log(projectGrades.data.gradesArray);
-                            setGradesArray(projectGrades.data.gradesArray);
-                            console.log(projectGrades.data.averageGrades);
-                            setAverageGrades(projectGrades.data.averageGrades);
-                            setDisplayGrades(true);
-                            setDisplayProjectName(projects.data[i].projectName);
                             console.log(projects.data[i].projectName);
+                            console.log(projectGrades.data.gradesArray);
+                            console.log(projectGrades.data.averageGrades);
+                            allProjectNames.push(projects.data[i].projectName);
+                            allGrades.push(projectGrades.data.gradesArray);
+                            allAverages.push(projectGrades.data.averageGrades);
+
                            
                         }
+                        setGradesArray(allGrades);
+                        setAverageGrades(allAverages);
+                        setDisplayProjectName(allProjectNames);
+                        setDisplayGrades(true);
                     }else
                     {
                         console.error("No projects found!");
@@ -341,8 +347,11 @@ export const Home = () => {
                         {displayGrades && (
                             <div className="text-center mt-5">
                             <h2>Display / Calculate Grades</h2>
-                            <p> {displayProjectName} has the grades : {gradesArray.join(", ")} and the avergage : {averageGrades}</p>
-                            
+                            {displayProjectName.map((projectName, index) => (
+                                <div key={index}>
+                                <p>{projectName} | Grades: {gradesArray[index].join(", ")} | Average Grade: {averageGrades[index]} </p>
+                              </div>
+                            ))}
                             </div>
                         )}
                                     
