@@ -13,6 +13,7 @@ export const Home = () => {
     const [grade, setGrade] = useState('');
 
     const [displayGrades, setDisplayGrades] = useState(false);
+    const [seeLivrabile, setSeeLivrabile] = useState(false);
     const [gradesArray, setGradesArray] = useState([]);
     const [averageGrades, setAverageGrades] = useState([]);
     const [displayProjectName, setDisplayProjectName] = useState([]);
@@ -301,7 +302,6 @@ export const Home = () => {
         }
     }
 
-  //setProjectInfo([displayGrades,gradesArray,averageGrades]);
     const gradesSeeCalculate= async e => {
         e.preventDefault();
         if(token)
@@ -359,6 +359,55 @@ export const Home = () => {
         }
     }
 
+    const seeLivrabilePartiale= async e => {
+        e.preventDefault();
+        if(token)
+        {
+            const userId = await getIdToken(token); 
+            try {
+                const user = await axios.put(`http://localhost:8080/users/getById/${userId}`);
+                if(user.data.type === "Professor")
+                {
+                    const profPassword = user.data.password;
+                    const projects =await axios.get("http://localhost:8080/projects")
+                    if(projects)
+                    {
+                        const allProjectNames = []; // Array to hold all proj names
+                        const allLivrabilePartiale = [];
+                        for(let i=0; i < projects.data.length; i++) {
+                             let projectId = projects.data[i].id;
+                             const projectGrades = await axios.get(`http://localhost:8080/projects/${projectId}/professor/${profPassword}/seeGrades`);
+                             //{ gradesArray, averageGrades }
+                            console.log(`The grades of the project with id : ${projectId} : `);
+                            console.log(projects.data[i].projectName);
+                            allProjectNames.push(projects.data[i].projectName);
+                            allLivrabilePartiale.push(projects.data[i].livrabilPartial);
+
+                           
+                        }
+                        setDisplayProjectName(allProjectNames);
+                        setDisplayLivrabilePartiale(allLivrabilePartiale);
+                        setSeeLivrabile(true);
+                    }else
+                    {
+                        console.error("No projects found!");
+                    }
+                  
+                }
+                else
+                {
+                    console.error("You try to generate the jury with type Studetn/PM. Log in as professor")
+                }
+                
+            }
+            catch(err)
+            {
+                console.error(err);
+            }
+            
+        }
+    }
+
     const handleLogout = async () => {
         localStorage.removeItem("token");
         if(!localStorage.token)
@@ -387,12 +436,24 @@ export const Home = () => {
             {userRole === 'Professor'   ? (    
                 <div className="container">
                     <div className="text-center mt-5">
+                        <button className="btn btn-outline-primary" type="button" style={{fontSize:"25px"}} onClick={seeLivrabilePartiale}>DISPLAY Livrabile Partiale</button>
                         <button className="btn btn-outline-warning" type="button" style={{fontSize:"25px"}} onClick={generateJury}>GENERATE JURY</button>
                         <button className="btn btn-outline-dark" type="button" style={{fontSize:"25px"}} onClick={gradesSeeCalculate}>DISPLAY / CALCULATE GRADES</button>
                         <p className="professor-text">WORKS ONLY FOR PROFESSOR USER TYPE</p>
                     </div>
+                     {/* Display livrabile section */}
+                     {seeLivrabile && (
+                        <div className="text-center mt-5">
+                        <h2>Livrabile Partiale</h2>
+                        {displayProjectName.map((projectName, index) => (
+                            <div key={index}>
+                            <p>{projectName} | Livrabile: {displayLivrabilePartiale[index]} </p>
+                            </div>
+                            ))}
+                        </div>
+                    )}    
                     {/* Display grades section */}
-                    {displayGrades && (
+                    {displayGrades && (seeLivrabile === false) && (
                         <div className="text-center mt-5">
                         <h2>Display / Calculate Grades</h2>
                         {displayProjectName.map((projectName, index) => (
