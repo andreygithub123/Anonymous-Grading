@@ -84,7 +84,7 @@ project_router
                         [Op.or]: [
                             { foreignKeyTeam: { [Op.not]: req.params.id } }, // Check if it's not equal to req.params.id
                             { foreignKeyTeam: { [Op.is]: null } } // Check if it's null
-                          ],
+                        ],
                         juryId: null     //!!!!!!!! Daca User1 este atribuit ca juriu echipei 1 si dupa random il atribuie echipei 2, no sa mai fie in jury la echipa 1
                     }
                 })
@@ -108,7 +108,7 @@ project_router
 
     })
 
-    //Router to let the professor see the grades of a project and calculate automatically the avergae excluding the mina nd the amx from the gradsArray
+//Router to let the professor see the grades of a project and calculate automatically the avergae excluding the mina nd the amx from the gradsArray
 project_router
     .route("/projects/:projectId/professor/:password/seeGrades")
     .get(async (req, res, next) => {
@@ -213,9 +213,66 @@ project_router
         }
 
     })
- //const gradesArray = JSON.parse(project.grades).map(parseFloat);
- function putGrade(projectGradesAsFloatArray,grade) {
+
+project_router
+    .route("/projects/:projectId/modifyGrade")
+    .post(async (req, res, next) => {
+        try {
+            //get the rpoject with id = Url.id
+            const project = await Project.findByPk(req.params.projectId);
+            if (!project) {
+                return res.status(404).json({ error: `Project with id ${req.params.projectId} not found` });
+            }
+
+            const newGrade = parseFloat(req.body.newGrade);
+            const oldGrade = parseFloat(req.body.oldGrade);
+
+            if(oldGrade !== null)
+            {
+                let intArray = JSON.parse(project.grades);
+                console.log(intArray);
+                console.log(typeof intArray);
+
+                if (typeof intArray === 'object') {
+                    console.log(oldGrade);
+                    console.log(newGrade);
+                    console.log(typeof intArray);
+
+                    for(let i=0 ; i< intArray.length; i++)
+                    {
+                        if(intArray[i] === oldGrade)
+                        {
+
+                            intArray[i] = newGrade;
+                            break;
+                        }
+                        
+                    }
+                    console.log(intArray);
+                    project.grades = JSON.stringify(intArray);
+                }
+            }
+            else if (typeof intArray === 'number')
+            {
+                    const resultArray = [];
+                    resultArray.push(newGrade);
+                    project.grades = JSON.stringify(resultArray);
+            }
+            await project.save();
+            return res.status(200).json(project);
+        }
+        catch (err) {
+            next(err);
+        }
+
+    })
+
+
+
+//const gradesArray = JSON.parse(project.grades).map(parseFloat);
+function putGrade(projectGradesAsFloatArray, grade) {
     projectGradesAsFloatArray.push(grade);
+
 }
 
 //export the router

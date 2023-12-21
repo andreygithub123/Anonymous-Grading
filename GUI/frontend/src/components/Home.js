@@ -261,6 +261,71 @@ export const Home = () => {
         }
     }
 
+
+    const modifyGradeProject= async e => {
+        e.preventDefault();
+        if(token)
+        {
+            const userId = await getIdToken(token);
+            try{
+                const oldUser = await axios.get(`http://localhost:8080/users/getById/${userId}`);
+                console.log(oldUser.data.gradeForProject);
+                if(oldUser)
+                {
+                    console.log(oldUser.data);
+                    console.log(oldUser.data.gradeForProject);
+                    const juryId = oldUser.data.juryId;
+                    const projects =await axios.get("http://localhost:8080/projects")
+                    if(projects)
+                    {
+                        for(let i=0; i < projects.data.length; i++) {
+                            let projectId = projects.data[i].id;
+                            if(projectId === juryId)
+                            {
+                                console.log(projectId);
+                                console.log(juryId);
+                                console.log("-----------");
+                                console.log(oldUser.data.updatedAt);
+                                const currentDate = new Date();
+                                const lastUpdatedDate = new Date(oldUser.data.updatedAt);
+                                const differenceInMilliseconds = currentDate - lastUpdatedDate;
+                                const differenceInMinutes = differenceInMilliseconds / (1000 * 60); // Convert milliseconds to minutes
+                                console.log(differenceInMinutes);
+
+                                if(differenceInMinutes <15)
+                                {
+                                    //post gardes
+                                    const response = await axios.post(`http://localhost:8080/projects/${projectId}/modifyGrade`,{
+                                    oldGrade: oldUser.data.gradeForProject,
+                                    newGrade: grade
+                                 });
+                                 console.log(response);
+                                }
+                                else
+                                {
+                                    console.error("You cannot modify the grade after 15 minutes!");
+                                }
+                                
+                            }
+                        }
+                        const user = await axios.put(`http://localhost:8080/users/getById/${userId}`, {
+                            gradeForProject : grade
+                        });
+                    }
+                    else
+                    {
+                        console.error("No projects found!");
+                    }
+                }
+            }
+            catch(err)
+            {
+                console.log(err);
+            }
+        }
+    }
+
+
     const generateJury= async e => {
         e.preventDefault();
         if(token)
@@ -537,6 +602,7 @@ export const Home = () => {
                             />
                             <div className="input-group-append ">
                             <button className="btn btn-outline-primary " type="button" style={{fontSize:"25px"}} onClick={gradeProject}>SUBMIT GRADE</button>
+                            <button className="btn btn-outline-primary " type="button" style={{fontSize:"25px"}} onClick={modifyGradeProject}>MODIFY GRADE</button>
                             </div>
                         </div>
                  </div>
