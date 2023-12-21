@@ -339,6 +339,7 @@ export const Home = () => {
                         setDisplayProjectName(allProjectNames);
                         setDisplayLivrabilePartiale(allLivrabilePartiale);
                         setDisplayGrades(true);
+                        setSeeLivrabile(false);
                     }else
                     {
                         console.error("No projects found!");
@@ -388,6 +389,8 @@ export const Home = () => {
                         setDisplayProjectName(allProjectNames);
                         setDisplayLivrabilePartiale(allLivrabilePartiale);
                         setSeeLivrabile(true);
+                        setDisplayGrades(false);
+                        
                     }else
                     {
                         console.error("No projects found!");
@@ -442,7 +445,7 @@ export const Home = () => {
                         <p className="professor-text">WORKS ONLY FOR PROFESSOR USER TYPE</p>
                     </div>
                      {/* Display livrabile section */}
-                     {seeLivrabile && (
+                     {seeLivrabile && (displayGrades === false) && (
                         <div className="text-center mt-5">
                         <h2>Livrabile Partiale</h2>
                         {displayProjectName.map((projectName, index) => (
