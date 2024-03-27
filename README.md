@@ -21,8 +21,3 @@ Anonymous-Grading is a full-stack web application developed to facilitate the an
 - Node.js
 - npm (Node Package Manager)
 - SQLite
-
-### Installation
-1. Clone the repository:
-   ```shell
-   git clone https://github.com/yourusername/Anonymous-Grading.git
